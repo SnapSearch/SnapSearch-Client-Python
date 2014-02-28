@@ -1,0 +1,20 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.2"
+  - "3.3"
+
+install:
+    - pip install pep8 --use-mirrors
+    - "if [[ $TRAVIS_PYTHON_VERSION == *2.6* ]]; then pip install unittest2; fi"
+    - pip install coverage --use-mirrors
+
+script:
+    - pep8 *.py
+    - coverage run tests/__init__.py --verbose
+    - coverage report -m
+
+notifications:
+  email:
+    - pineapple.liu@gmail.com

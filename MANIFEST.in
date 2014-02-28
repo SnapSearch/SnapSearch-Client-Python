@@ -1,0 +1,7 @@
+include README.rst
+include LICENSE
+include MANIFEST.in
+include setup.py
+recursive-include src *.py
+recursive-include tests *.py
+recursive-include resources *.*

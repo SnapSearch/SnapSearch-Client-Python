@@ -1,0 +1,26 @@
+{
+	"generic": [
+		"html",
+		"htm",
+		"shtml",
+		"xhtml",
+		"xht",
+		"cgi"
+	],
+	"python": [
+		"py"
+	],
+	"php": [
+		"php"
+	],
+	"asp": [
+		"asp",
+		"aspx"
+	],
+	"java": [
+		"jsp"
+	],
+	"perl": [
+		"pl"
+	]
+}

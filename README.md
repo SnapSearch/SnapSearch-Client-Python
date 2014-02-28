@@ -1,2 +1,0 @@
-SnapSearch-Client-Python
-========================
