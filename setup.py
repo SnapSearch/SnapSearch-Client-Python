@@ -1,8 +1,14 @@
+#!/usr/bin/env python
+#
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
-"""Setup script for SnapSearch-Client package distribution."""
+#
+"""
+Setup script for SnapSearch-Client-Python package distribution.
+"""
 
 PACKAGE = "SnapSearch-Client-Python"
+PY_PACKAGE = "SnapSearch"
 
 import os
 import sys
@@ -11,10 +17,8 @@ from distutils.core import setup
 from glob import glob
 from os.path import isfile, join
 
-sys.path.append(join('src', ))
-import SnapSearch as pkg
 
-
+# auxiliary files for installation
 def get_data_files():
     #
     data_files = []
@@ -43,10 +47,15 @@ def get_data_files():
     return data_files
 
 
+# make sure local package overrides installed (old) package
+sys.path.append(join('src', ))
+import SnapSearch as pkg
+
 setup(
     name=PACKAGE,
-    package_dir={'SnapSearch': join('src', 'SnapSearch', ), },
-    packages=['SnapSearch', ],
+    packages=[PY_PACKAGE, ],
+    package_dir={PY_PACKAGE: join("src", PY_PACKAGE, ), },
+    package_data={PY_PACKAGE: glob(join("resources", "*.*")), },
     data_files=get_data_files(),
     version=".".join(map(str, pkg.__version__)),
     author=pkg.__author__,

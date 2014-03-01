@@ -1,14 +1,16 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 
-# This has to be the first statement.
-from __future__ import with_statement
+__all__ = ['test_suite', ]
 
-import os
-import sys
+from . import (test_client, test_detector, test_interceptor)
+from ._config import unittest, TestPackageIntegrity
 
-# Use unittest2 on versions older than Python 2.7.
-if sys.version_info[0] < 3 and sys.version_info[1] < 7:
-    from unittest2 import TestCase, main
-else:
-    from unittest import TestCase, main
+
+def test_suite():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.TestLoader().
+                  loadTestsFromTestCase(TestPackageIntegrity))
+    for pkg in (test_client, test_detector, test_interceptor):
+        suite.addTest(pkg.test_suite())
+    return suite

@@ -2,6 +2,6 @@ include README.rst
 include LICENSE
 include MANIFEST.in
 include setup.py
-recursive-include src *.py
-recursive-include tests *.py
-recursive-include resources *.*
+recursive-include resources *.pem *.json
+recursive-include src *.py *.pem *.json
+recursive-include tests *.py *.json

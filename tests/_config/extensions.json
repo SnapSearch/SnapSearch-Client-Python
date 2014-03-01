@@ -1,0 +1,20 @@
+{
+	"generic": [
+		"html",
+		"htm",
+		"test"
+	],
+	"php": [
+		"php"
+	],
+	"asp": [
+		"asp",
+		"aspx"
+	],
+	"java": [
+		"jsp"
+	],
+	"perl": [
+		"pl"
+	]
+}

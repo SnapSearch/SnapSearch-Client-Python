@@ -5,14 +5,17 @@ python:
   - "3.2"
   - "3.3"
 
-install:
+before_install:
     - pip install pep8 --use-mirrors
     - "if [[ $TRAVIS_PYTHON_VERSION == *2.6* ]]; then pip install unittest2; fi"
     - pip install coverage --use-mirrors
 
+install:
+    - python setup.py install
+
 script:
     - pep8 *.py
-    - coverage run tests/__init__.py --verbose
+    - coverage run --omit "*test*" -m tests --verbose
     - coverage report -m
 
 notifications:
