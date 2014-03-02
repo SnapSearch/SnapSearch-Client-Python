@@ -18,7 +18,7 @@ from glob import glob
 from os.path import isfile, join
 
 
-# auxiliary files for installation
+# auxiliary data files for installation
 def get_data_files():
     #
     data_files = []
@@ -47,8 +47,8 @@ def get_data_files():
     return data_files
 
 
-# make sure local package overrides installed (old) package
-sys.path.append(join('src', ))
+# make sure local (up-to-date) package overrides installed (old) package
+sys.path.insert(0, join('src', ))
 import SnapSearch as pkg
 
 setup(
@@ -64,9 +64,9 @@ setup(
     description=pkg.__doc__,
     long_description=open("README.rst").read(),
     keywords=["SnapSearch", "client", "SEO"],
-    url="https://github.com/liuyu81/SnapSearch-Client",
+    url="https://github.com/liuyu81/SnapSearch-Client-Python",
     classifiers=[
-        "Development Status :: 2 - PreAlpha",
+        "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
