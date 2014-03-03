@@ -1,0 +1,23 @@
+{
+    "HTTP_ACCEPT": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "REQUEST_URI": "/wsgi/",
+    "HTTP_USER_AGENT": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.74.9 (KHTML, like Gecko) Version/6.1.2 Safari/537.74.9",
+    "HTTP_CONNECTION": "keep-alive",
+    "REMOTE_PORT": "63751",
+    "SERVER_NAME": "localhost",
+    "REMOTE_ADDR": "123.165.94.242",
+    "HTTP_ACCEPT_LANGUAGE": "zh-cn",
+    "GATEWAY_INTERFACE": "CGI/1.1",
+    "SERVER_SOFTWARE": "Apache/2.2.15 (CentOS)",
+    "SCRIPT_NAME": "/wsgi/",
+    "REQUEST_METHOD": "GET",
+    "HTTP_HOST": "localhost",
+    "PATH_INFO": "",
+    "SERVER_PORT": "80",
+    "SERVER_PROTOCOL": "HTTP/1.1",
+    "QUERY_STRING": "",
+    "HTTP_CACHE_CONTROL": "max-age=0",
+    "HTTP_ACCEPT_ENCODING": "gzip, deflate",
+    "SERVER_ADDR": "127.0.0.1",
+    "HTTP_DNT": "1"
+}

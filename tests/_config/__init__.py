@@ -8,6 +8,15 @@ import shutil
 import sys
 import tempfile
 
+# package name unification
+
+try:
+    # python 2.6+
+    import json
+except ImportError:
+    # python 2.5
+    import simplejson as json
+
 try:
     # python 2.6
     import unittest2 as unittest
@@ -39,7 +48,7 @@ def save_temp(name, data=b"", mode=0o666):
     """
     path = os.path.join(TEMP_DIR, name)
     try:
-        with open(path, "wb") as f:
+        with open(path, 'wb') as f:
             f.write(data)
             f.close()
         os.chmod(path, mode)
@@ -64,8 +73,10 @@ atexit.register(cleanup)
 
 # pre-fetched data
 
-DATA_ROBOTS_JSON = load_data("robots.json")
-DATA_EXTENSIONS_JSON = load_data("extensions.json")
+DATA_ROBOTS_JSON = load_data("robots.json").decode('utf-8')
+DATA_EXTENSIONS_JSON = load_data("extensions.json").decode('utf-8')
+DATA_FIREFOX_REQUEST = load_data("req_firefox.json").decode('utf-8')
+DATA_SAFARI_REQUEST = load_data("req_safari.json").decode('utf-8')
 
 
 # preliminary tests
@@ -81,7 +92,7 @@ class TestPackageIntegrity(unittest.TestCase):
 
     def test_package(self):
         import SnapSearch
-        self.assertTrue(SnapSearch.__version__ >= (0, 0, 1))
+        self.assertTrue(SnapSearch.__version__ >= (0, 0, 2))
         self.assertTrue(isinstance(SnapSearch.Client, object))
         self.assertTrue(isinstance(SnapSearch.Detector, object))
         self.assertTrue(isinstance(SnapSearch.Interceptor, object))

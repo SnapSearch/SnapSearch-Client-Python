@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+#
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
+#
 
 # future import should be the beginning line
 from __future__ import with_statement
@@ -9,6 +11,7 @@ __all__ = ['Detector', ]
 
 import os
 import re
+import wsgiref.util
 
 from ._config import DEFAULT_ROBOTS_JSON, DEFAULT_EXTENSIONS_JSON
 from ._config import json, unicode_to_wsgi
@@ -45,12 +48,13 @@ class Detector(object):
         self.__ignored_routes = ignored_routes
         self.__matched_routes = matched_routes
 
-        # load OS environment variables as default HTTP request (CGI need this)
+        # Python does not have a global object for HTTP request, rather, the
+        # HTTP request data are available as a CGI/WSGI environment.
         self.__request = request or dict(
             [(k, unicode_to_wsgi(v)) for k, v in os.environ.items()])
 
-        # if `extensions.json` is specified, yet it doesn't ask to check file
-        # extensions, then it is probably be a mistake
+        # `extensions.json` is specified, yet do not require checking file
+        # extensions. this probably means a misuse.
         assert(not (not check_file_extensions and extensions_json))
         self.__check_file_extensions = check_file_extensions
 

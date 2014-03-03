@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+#
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
+#
 
 __all__ = ['DEFAULT_ROBOTS_JSON', 'DEFAULT_EXTENSIONS_JSON', 'json', ]
 

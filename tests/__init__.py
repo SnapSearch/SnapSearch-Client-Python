@@ -1,5 +1,11 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
+#
+"""
+Test Suite for SnapSearch-Client-Python
+"""
 
 __all__ = ['test_suite', ]
 

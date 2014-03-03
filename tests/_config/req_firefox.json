@@ -1,0 +1,14 @@
+{
+    "CONTENT_TYPE": "",
+    "SCRIPT_NAME": "/snapsearch",
+    "REQUEST_METHOD": "GET",
+    "HTTP_HOST": "localhost",
+    "PATH_INFO": "/",
+    "SERVER_PROTOCOL": "HTTP/1.1",
+    "QUERY_STRING": "",
+    "CONTENT_LENGTH": "",
+    "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0",
+    "SERVER_NAME": "localhost",
+    "REMOTE_ADDR": "::1",
+    "SERVER_PORT": "80"
+}
