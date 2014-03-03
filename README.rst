@@ -12,22 +12,34 @@ Snapsearch Client Python is Python based framework agnostic HTTP client library 
 SnapSearch provides similar libraries in other languages: https://github.com/SnapSearch/SnapSearch-Clients
 
 
-Development Status
+Development
 ------------------
 
-Life-Cycle Stage: 2 Prototyping (PreAlpha)
+Status:
+  - 2 Prototyping (PreAlpha)
 
-Supports Python 2.6-3.3.
+Standards:
+  - :RFC:`3986` : URI
+  - :RFC:`3875` : CGI 1.1
+  - :PEP:`3333` : WSGI 1.0.1
 
-Requires: PycURL_ or Requests_.
+Style Guide:
+  - :PEP:`8` : identation and spacing
+  - :PEP:`287` : comments and docstrings
+  - string literals
+
+    - key to a ``dict`` object: ``values['key']``, ``values.get('key')``
+    - bytes or unicode data: ``"key" in values``
+    - bytes or unicode messages: ``print("hello!")``
+    - paths or file names: ``open("filename")``
+    - docstring: ``"""doc"""``
+
+Requires:
+  - Python 2.6, 2.7, 3.2, 3.3
+  - HTTP lib: PycURL_ or Requests_
 
 .. _PycURL: http://pycurl.sourceforge.net/
 .. _Requests: http://python-requests.org/
-
-Coding Style: PEP8_, PEP287_
-
-.. _PEP8: http://legacy.python.org/dev/peps/pep-0008/
-.. _PEP287: http://legacy.python.org/dev/peps/pep-0287/
 
 
 Installation

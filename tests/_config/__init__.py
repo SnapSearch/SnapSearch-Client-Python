@@ -1,5 +1,11 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
+#
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/03
+#
 
 import atexit
 import os
@@ -8,7 +14,7 @@ import shutil
 import sys
 import tempfile
 
-# package name unification
+# package names unification
 
 try:
     # python 2.6+
@@ -73,10 +79,24 @@ atexit.register(cleanup)
 
 # pre-fetched data
 
-DATA_ROBOTS_JSON = load_data("robots.json").decode('utf-8')
-DATA_EXTENSIONS_JSON = load_data("extensions.json").decode('utf-8')
-DATA_FIREFOX_REQUEST = load_data("req_firefox.json").decode('utf-8')
-DATA_SAFARI_REQUEST = load_data("req_safari.json").decode('utf-8')
+DATA_ROBOTS_JSON = load_data("robots.json").decode("utf-8")
+DATA_EXTENSIONS_JSON = load_data("extensions.json").decode("utf-8")
+
+DATA_FIREFOX_REQUEST = load_data("req_firefox.json").decode("utf-8")
+DATA_SAFARI_REQUEST = load_data("req_safari.json").decode("utf-8")
+DATA_ESCAPE_FRAG_NULL = load_data("req_escape_frag_null.json").decode("utf-8")
+DATA_ESCAPE_FRAG_VARS = load_data("req_escape_frag_vars.json").decode("utf-8")
+DATA_MSNBOT_MATCHED = load_data("req_msnbot_matched.json").decode("utf-8")
+
+DATA_SNAPSEARCH_GET = load_data("req_snapsearch_get.json").decode("utf-8")
+
+DATA_ADSBOT_GOOG_GET = load_data("req_adsbot_goog_get.json").decode("utf-8")
+DATA_ADSBOT_GOOG_HTML = load_data("req_adsbot_goog_html.json").decode("utf-8")
+DATA_ADSBOT_GOOG_MP3 = load_data("req_adsbot_goog_mp3.json").decode("utf-8")
+DATA_ADSBOT_GOOG_POST = load_data("req_adsbot_goog_post.json").decode("utf-8")
+
+DATA_GOOGBOT_IGNORED = load_data("req_googbot_ignored.json").decode("utf-8")
+DATA_MSNBOT_MATCHED = load_data("req_msnbot_matched.json").decode("utf-8")
 
 
 # preliminary tests

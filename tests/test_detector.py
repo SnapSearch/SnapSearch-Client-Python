@@ -4,11 +4,14 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 #
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/03
+#
 
 # future import should be the beginning line
 from __future__ import with_statement
 
-__all__ = ['TestDetectorInit', 'TestDetectorDetect', ]
+__all__ = ['TestDetectorInit', 'TestDetectorMethods', 'TestDetectorProperty', ]
 
 try:
     from . import _config
@@ -23,10 +26,11 @@ class TestDetectorInit(unittest.TestCase):
     Tests different ways to initialize a Detector object.
     """
     def setUp(self):
-        self.CUSTOM_ROBOTS_JSON = _config.save_temp(
-            "robots.json", _config.DATA_ROBOTS_JSON.encode('utf-8'))
-        self.CUSTOM_EXTENSIONS_JSON = _config.save_temp(
-            "extensions.json", _config.DATA_EXTENSIONS_JSON.encode('utf-8'))
+        # save local data to temporary files
+        self.EXTERNAL_ROBOTS_JSON = _config.save_temp(
+            "robots.json", _config.DATA_ROBOTS_JSON.encode("utf-8"))
+        self.EXTERNAL_EXTENSIONS_JSON = _config.save_temp(
+            "extensions.json", _config.DATA_EXTENSIONS_JSON.encode("utf-8"))
         pass  # void return
 
     def test_default_init(self):
@@ -36,49 +40,172 @@ class TestDetectorInit(unittest.TestCase):
         # make sure the default `robots.json` is loaded
         self.assertTrue(hasattr(d, 'robots'))
         self.assertTrue(d.robots)
-        self.assertTrue("Bingbot" in d.robots["match"])
+        self.assertTrue("Bingbot" in d.robots['match'])
         # make sure the default `extensions.json` is loaded
         self.assertTrue(hasattr(d, 'extensions'))
         self.assertTrue(d.extensions)
-        self.assertTrue("html" in d.extensions["generic"])
+        self.assertTrue("html" in d.extensions['generic'])
         pass  # void return
 
     def test_external_robots_json(self):
         # initialize with external `robots.json`
         from SnapSearch import Detector
-        d = Detector(robots_json=self.CUSTOM_ROBOTS_JSON)
+        d = Detector(robots_json=self.EXTERNAL_ROBOTS_JSON)
         self.assertTrue(d.robots)
-        self.assertTrue("Testbot" in d.robots["match"])
+        self.assertTrue("Testbot" in d.robots['match'])
         pass  # void return
 
     def test_external_extensions_json(self):
         # initialize with external `extensions.json`
         from SnapSearch import Detector
         d = Detector(check_file_extensions=True,
-                     extensions_json=self.CUSTOM_EXTENSIONS_JSON)
+                     extensions_json=self.EXTERNAL_EXTENSIONS_JSON)
         self.assertTrue(d.extensions)
-        self.assertTrue("test" in d.extensions["generic"])
+        self.assertTrue("test" in d.extensions['generic'])
         # specified `extensions.json` but `check_file_extensions` is False
         self.assertRaises(AssertionError, Detector,
                           check_file_extensions=False,
-                          extensions_json=self.CUSTOM_EXTENSIONS_JSON)
+                          extensions_json=self.EXTERNAL_EXTENSIONS_JSON)
         pass  # void return
 
     pass
 
 
-class TestDetectorDetect(unittest.TestCase):
+class TestDetectorMethods(unittest.TestCase):
     """
-    Test detection with different HTTP/HTTPS requests.
+    Test Detector.detect() with different HTTP/HTTPS requests.
     """
     def setUp(self):
         self.FIREFOX_REQUEST = json.loads(_config.DATA_FIREFOX_REQUEST)
+        self.SAFARI_REQUEST = json.loads(_config.DATA_SAFARI_REQUEST)
+        self.ADSBOT_GOOG_GET = json.loads(_config.DATA_ADSBOT_GOOG_GET)
+        self.ADSBOT_GOOG_HTML = json.loads(_config.DATA_ADSBOT_GOOG_HTML)
+        self.ADSBOT_GOOG_MP3 = json.loads(_config.DATA_ADSBOT_GOOG_MP3)
+        self.ADSBOT_GOOG_POST = json.loads(_config.DATA_ADSBOT_GOOG_POST)
+        self.SNAPSEARCH_GET = json.loads(_config.DATA_SNAPSEARCH_GET)
+        self.GOOGBOT_IGNORED = json.loads(_config.DATA_GOOGBOT_IGNORED)
+        self.MSNBOT_MATCHED = json.loads(_config.DATA_MSNBOT_MATCHED)
+        self.ESCAPE_FRAG_NULL = json.loads(_config.DATA_ESCAPE_FRAG_NULL)
+        self.ESCAPE_FRAG_VARS = json.loads(_config.DATA_ESCAPE_FRAG_VARS)
         pass  # void return
 
-    def test_normal_browser(self):
+    def test_normal_browser_firefox(self):
         from SnapSearch import Detector
         d = Detector(request=self.FIREFOX_REQUEST)
+        self.assertFalse(d.detect())  # should *not* be intercepted
+        pass  # void return
+
+    def test_normal_browser_safari(self):
+        from SnapSearch import Detector
+        d = Detector(request=self.SAFARI_REQUEST)
+        self.assertFalse(d.detect())  # should *not* be intercepted
+        pass  # void return
+
+    def test_search_engine_bot(self):
+        from SnapSearch import Detector
+        d = Detector(request=self.ADSBOT_GOOG_GET)
+        self.assertTrue(d.detect())  # should be intercepted
+        pass  # void return
+
+    def test_search_engine_bot_ignored_route(self):
+        from SnapSearch import Detector
+        d = Detector(ignored_routes=['^\/other', '^\/ignored', ],
+                     request=self.GOOGBOT_IGNORED)
+        self.assertFalse(d.detect())  # should *not* be intercepted
+        pass  # void return
+
+    def test_search_engine_bot_matched_route(self):
+        from SnapSearch import Detector
+        d = Detector(matched_routes=['^\/other', '^\/matched', ],
+                     request=self.MSNBOT_MATCHED)
+        self.assertTrue(d.detect())  # should be intercepted
+        pass  # void return
+
+    def test_search_engine_bot_non_matched_route(self):
+        from SnapSearch import Detector
+        d = Detector(matched_routes=['^\/other', '^\/non_matched_route', ],
+                     request=self.MSNBOT_MATCHED)
+        self.assertFalse(d.detect())  # should *not* be intercepted
+        pass  # void return
+
+    def test_search_engine_bot_post(self):
+        from SnapSearch import Detector
+        d = Detector(request=self.ADSBOT_GOOG_POST)
+        self.assertEqual(d.detect(), False)  # should *not* be intercepted
+        pass  # void return
+
+    def test_snap_search_bot(self):
+        from SnapSearch import Detector
+        d = Detector(request=self.SNAPSEARCH_GET)
+        self.assertFalse(d.detect())  # should *not* be intercepted
+        pass  # void return
+
+    def test_check_file_ext_eligible(self):
+        from SnapSearch import Detector
+        d = Detector(check_file_extensions=True,
+                     request=self.ADSBOT_GOOG_HTML)
+        self.assertTrue(d.detect())  # should be intercepted
+        pass  # void return
+
+    def test_check_file_ext_ineligible(self):
+        from SnapSearch import Detector
+        d = Detector(check_file_extensions=True,
+                     request=self.ADSBOT_GOOG_MP3)
+        self.assertFalse(d.detect())  # should *not* be intercepted
+        pass  # void return
+
+    def test_check_file_ext_non_existent(self):
+        from SnapSearch import Detector
+        d = Detector(check_file_extensions=True,
+                     request=self.ADSBOT_GOOG_HTML)
+        self.assertTrue(d.detect())  # should be intercepted
+        pass  # void return
+
+    def test_escape_frag_null(self):
+        from SnapSearch import Detector
+        d = Detector(request=self.ESCAPE_FRAG_NULL)
+        self.assertTrue(d.detect())  # should be intercepted
+        pass  # void return
+
+    def test_escape_frag_vars(self):
+        from SnapSearch import Detector
+        d = Detector(request=self.ESCAPE_FRAG_VARS)
+        self.assertTrue(d.detect())  # should be intercepted
+        self.assertEqual(d.get_encoded_url(), "http://localhost/snapsearch"
+                         "/path1?key1=value1#!/path2?key2=value2")
+        pass  # void return
+
+
+class TestDetectorProperty(unittest.TestCase):
+    """
+    Tests updating ``robots`` and ``extensions`` of a Detector object.
+    """
+    def setUp(self):
+        self.ADSBOT_GOOG_GET = json.loads(_config.DATA_ADSBOT_GOOG_GET)
+        self.ADSBOT_GOOG_MP3 = json.loads(_config.DATA_ADSBOT_GOOG_MP3)
+
+    def test_update_robots(self):
+        from SnapSearch import Detector
+        d = Detector(request=self.ADSBOT_GOOG_GET)
+        # append a robot to the white list
+        self.assertTrue(d.detect())
+        d.robots['ignore'].append("Adsbot-Google")
         self.assertFalse(d.detect())
+        # try to damange the structure of ``robots``
+        d.robots['ignore'] = None
+        self.assertRaises(TypeError, d.detect)
+        pass  # void return
+
+    def test_update_extension(self):
+        from SnapSearch import Detector
+        d = Detector(check_file_extensions=True,
+                     request=self.ADSBOT_GOOG_MP3)
+        self.assertFalse(d.detect())
+        d.extensions['generic'].append("mp3")
+        self.assertTrue(d.detect())
+        # try to damange the structure of ``extensions``
+        d.extensions['generic'] = None
+        self.assertRaises(TypeError, d.detect)
         pass  # void return
 
     pass

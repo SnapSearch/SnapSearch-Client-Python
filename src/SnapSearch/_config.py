@@ -10,7 +10,25 @@ import os
 import os.path
 import sys
 
-# package name unification
+# debugging flag
+
+DEBUG = ('DEBUG' in os.environ) and ('NDEBUG' not in os.environ)
+
+# package names unification
+
+try:
+    # python 3.x
+    from urllib.parse import parse_qs as url_parse_qs
+    from urllib.parse import quote as url_quote
+    from urllib.parse import urlsplit as url_split
+    from urllib.parse import unquote as url_unquote
+except ImportError:
+    # python 2.x
+    from urlparse import parse_qs as url_parse_qs
+    from urllib import quote as url_quote
+    from urlparse import urlsplit as url_split
+    from urllib import unquote as url_unquote
+
 try:
     # python 2.6+
     import json
@@ -18,6 +36,22 @@ except ImportError:
     # python 2.5
     import simplejson as json
 
+# python 3.2 dropped explicit unicode literal, i.e., u"str" being illegal, so
+# we need a helper function u("str") to emulate u"str" (see :PEP:`414`).
+
+if sys.version_info[0] == 2:
+
+    def u(s):
+        return unicode(s, "unicode_escape")
+
+    pass
+
+else:
+
+    def u(s):
+        return s
+
+    pass
 
 # package data localization
 
@@ -40,16 +74,15 @@ DEFAULT_EXTENSIONS_JSON = validated_resource("extensions.json")
 # string encoding utilities
 
 # HTTP does not directly support Unicode. So all string variables must either
-# be ISO-8859-1 characters, or use RFC 2047 MIME encoding. c.f. PEP-3333 by
-# P. J. Eby <pje@telecommunity.com>
+# be ISO-8859-1 characters, or use RFC 2047 MIME encoding (see :PEP:``3333``).
 
-# surrogate escape c.f. PEP-383 by Martin v. Löwis <martin@v.loewis.de>
-enc, esc = sys.getfilesystemencoding(), 'surrogateescape'
+# surrogate escape (see :PEP:`383`)
+enc, esc = sys.getfilesystemencoding(), "surrogateescape"
 
 
 def unicode_to_wsgi(u):
-    return u.encode(enc, esc).decode('iso-8859-1')
+    return u.encode(enc, esc).decode("iso-8859-1")
 
 
 def wsgi_to_bytes(s):
-    return s.encode('iso-8859-1')
+    return s.encode("iso-8859-1")
