@@ -112,7 +112,7 @@ class TestPackageIntegrity(unittest.TestCase):
 
     def test_package(self):
         import SnapSearch
-        self.assertTrue(SnapSearch.__version__ >= (0, 0, 2))
+        self.assertTrue(SnapSearch.__version__ >= (0, 0, 3))
         self.assertTrue(isinstance(SnapSearch.Client, object))
         self.assertTrue(isinstance(SnapSearch.Detector, object))
         self.assertTrue(isinstance(SnapSearch.Interceptor, object))

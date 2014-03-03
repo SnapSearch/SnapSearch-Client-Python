@@ -73,10 +73,10 @@ DEFAULT_EXTENSIONS_JSON = validated_resource("extensions.json")
 
 # string encoding utilities
 
-# HTTP does not directly support Unicode. So all string variables must either
-# be ISO-8859-1 characters, or use RFC 2047 MIME encoding (see :PEP:``3333``).
+# HTTP does not directly support Unicode. So string variables must either be
+# ISO-8859-1 characters, or use :RFC:`2047` MIME encoding (see :PEP:``3333``).
 
-# surrogate escape (see :PEP:`383`)
+# :PEP:`383`: surrogate escape
 enc, esc = sys.getfilesystemencoding(), "surrogateescape"
 
 

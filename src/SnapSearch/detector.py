@@ -19,27 +19,133 @@ from ._config import url_parse_qs, url_quote, url_split, url_unquote
 from ._config import DEBUG, DEFAULT_ROBOTS_JSON, DEFAULT_EXTENSIONS_JSON
 
 
-def wsgify_request(request=None):
+class Request(dict):
     """
-    Copies and extends an OS / CGI environment with WSGI-defined variables.
+    Request wraps an OS / CGI environ and adds WSGI-defined variables.
     """
-    # make a (shallow) copy of the request
-    environ = {}
-    if isinstance(request, dict):
-        environ.update(request)
-    # add absent variables from the global OS / CGI environment
-    for k, v in os.environ.items():
-        environ.setdefault(k, unicode_to_wsgi(v))
-    # add absent WSGI-defined variables (see :PEP:`3333`).
-    environ.setdefault('wsgi.version', (1, 0))
-    environ.setdefault('wsgi.input',
-                       getattr(sys.stdin, 'buffer', None) or sys.stdin)
-    environ.setdefault('wsgi.errors', sys.stderr)
-    environ.setdefault('wsgi.multithread', False)
-    environ.setdefault('wsgi.multiprocess', True)
-    environ.setdefault('wsgi.run_once', True)
-    environ.setdefault('wsgi.url_scheme', wsgiref.util.guess_scheme(environ))
-    return environ
+
+    @property
+    def GET(self):
+        """
+        Returns parsed ``QUERY_STRING`` as a MultiDict.
+        """
+        # :PEP:`3333`: ``QUERY_STRING`` MAY be empty or absent.
+        if not self.__parsed_qs:
+            self.__parsed_qs = url_parse_qs(self.get('QUERY_STRING', ""), True)
+        return self.__parsed_qs
+
+    @property
+    def scheme(self):
+        """
+        Returns ``wsgi.url_scheme``
+        """
+        # WSGI-defined variable ``wsgi.url_scheme`` MUST present.
+        return self['wsgi.url_scheme']
+
+    @property
+    def method(self):
+        """
+        Returns ``REQUEST_METHOD`` or ``"N/A"``
+        """
+        # :PEP:`3333`: ``REQUEST_METHOD`` MUST present and be non-empty.
+        if not 'REQUEST_METHOD' in self:
+            self['REQUEST_METHOD'] = "N/A"
+        return self['REQUEST_METHOD']
+
+    @property
+    def user_agent(self):
+        """
+        Returns ``HTTP_USER_AGENT`` or ``""``
+        """
+        # :PEP:`3333`: ``HTTP_USER_AGENT`` MAY be empty or absent.
+        return self.get('HTTP_USER_AGENT', "")
+
+    @property
+    def path_qs(self):
+        """
+        Relative request URL without ``HTTP_HOST`` but with ``QUERY_STRING``,
+        decoded from both :RFC:`3986` percent-encoding (``'%20'``-> ``' '``)
+        and Google's ``_escaped_fragment_``__ protocol.
+
+        .. __: http://developers.google.com/webmasters/ajax-crawling/docs
+               /specification
+        """
+        return self._get_decoded_path(True)
+
+    @property
+    def url(self):
+        """
+        Full request URL including ``HTTP_HOST`` and ``QUERY_STRING``, encoded
+        to :RFC:`3986` percent-encoding (``' '``-> ``'%20'``), but decoded from
+        Google's ``_escaped_fragment_``__ protocol.
+
+        .. __: http://developers.google.com/webmasters/ajax-crawling/docs
+               /specification
+        """
+        return self._get_encoded_url(True)
+
+    # private properties
+    __slots__ = ['__parsed_qs', ]
+
+    def __init__(self, environ={}):
+        # make a (shallow) copy of the environ
+        super(Request, self).__init__(environ)
+        # add missing variables from the global OS / CGI environment
+        for key, val in os.environ.items():
+            self.setdefault(key, unicode_to_wsgi(val))
+        # add missing WSGI-defined variables (see :PEP:`3333`).
+        self.setdefault('wsgi.version', (1, 0))
+        self.setdefault('wsgi.input', getattr(sys.stdin, 'buffer', sys.stdin))
+        self.setdefault('wsgi.errors', sys.stderr)
+        self.setdefault('wsgi.multithread', False)
+        self.setdefault('wsgi.multiprocess', True)
+        self.setdefault('wsgi.run_once', True)
+        self.setdefault('wsgi.url_scheme', wsgiref.util.guess_scheme(self))
+        # parsed query string
+        self.__parsed_qs = {}
+        pass  # void return
+
+    def _get_encoded_url(self, include_qs=True):
+        # percent-encoded full uri, to be passed to SnapSearch backend.
+        if include_qs and "_escaped_fragment_" in self.GET:
+            return self._get_encoded_url(False) + "%(qs)s%(hash)s" % \
+                self._get_real_qs_and_hash_fragment(True)
+        return wsgiref.util.request_uri(self, include_qs)
+
+    def _get_decoded_path(self, include_qs=True):
+        # un-percent-encoded request uri, relative to site root (/).
+        if include_qs and "_escaped_fragment_" in self.GET:
+            return self._get_decoded_path(False) + "%(qs)s%(hash)s" % \
+                self._get_real_qs_and_hash_fragment(False)
+        url = url_split(wsgiref.util.request_uri(self, True))
+        path = "?".join([url.path, url.query]) if include_qs else url.path
+        return url_unquote(path)
+
+    def _get_real_qs_and_hash_fragment(self, encode):
+        # Gets the real query string and hash fragment by reversing Google's
+        # ``_escaped_fragment_``__ protocol to the hash bang mode.
+        #
+        # .. __: http://developers.google.com/webmasters/ajax-crawling/docs
+        #        /specification
+
+        # build query parameters and hash fragment. note that ``self.GET`` is a
+        # ``MultiDict``, namely, each ``key`` identifies a list of ``val``'s.
+        # keep this in mind when trying to enumerate all ``key``-``val`` pairs.
+        qs = []
+        frag = []
+        for key, val_list in self.GET.items():
+            if key == "_escaped_fragment_":
+                frag.extend(filter(None, val_list))
+                continue
+            qs.extend(["%s=%s" % (key, val) for val in val_list])
+
+        # apply encoding / decoding filter
+        f = url_unquote if encode else url_quote
+
+        return {'qs': f("?{0}".format("&".join(qs)) if qs else ""),
+                'hash': f("#!{0}".format("".join(frag)) if frag else "")}
+
+    pass
 
 
 class Detector(object):
@@ -47,8 +153,51 @@ class Detector(object):
     Detects if the current request is from a search engine robot
     """
 
+    @property
+    def robots(self):
+        """
+        The ``robots`` property is a ``dict`` of user agent lists:
+
+        .. code:: json
+
+            {
+                "ignore": [
+                    # user agents to be ignored
+                ]
+                "match": [
+                    # user agents to be matched
+                ]
+            }
+
+        The ``ignore`` list takes precedence over the ``match`` list when
+        running the detection algorithm. You can change each list to customise
+        ignored and matched robots.
+        """
+        return self.__robots
+
+    @property
+    def extensions(self):
+        """
+        The ``extensions`` property is a ``dict`` of valid extensions lists:
+
+        .. code:: json
+
+            {
+                "generic": [
+                    # valid generic extensions
+                ],
+                "python": [
+                    # valid python extensions
+                ]
+            }
+
+        You can change each list to customise valid file extensions.
+        """
+        return self.__extensions
+
+    # private properties
     __slots__ = ['__ignored_routes', '__matched_routes', '__request',
-                 '__check_file_extensions', 'extensions', 'robots', ]
+                 '__check_file_extensions', '__extensions', '__robots', ]
 
     def __init__(self,
                  ignored_routes=[],
@@ -58,13 +207,12 @@ class Detector(object):
                  robots_json=None,
                  extensions_json=None):
         """
-        The constructor.
-
         Keyword arguments:
+
         :param ignored_routes: ``list|tuple`` of blacklisted route regexes.
         :param matched_routes: ``list|tuple`` of whitelisted route regexes.
         :param request: ``dict`` of HTTP request variables.
-        :param check_file_extensions: ``bool`` to check if the url is going to
+        :param check_file_extensions: ``bool`` to check if the URL is going to
             a static file resource that should not be intercepted.
         :param robots_json: absolute path to a ``robots.json`` file.
         :param extensions_json: absolute path to an ``extensions.json`` file.
@@ -73,52 +221,67 @@ class Detector(object):
         self.__ignored_routes = set(ignored_routes)
         self.__matched_routes = set(matched_routes)
 
-        # Python does not have a global object for HTTP request, rather, the
-        # HTTP request data are available from OS / CGI / WSGI environment.
-        self.__request = wsgify_request(request)
+        # wrap incoming request as a Request object
+        self.__request = Request(request)
 
         # ``extensions.json`` is specified, yet do not require checking file
-        # extensions. this probably means a misuse.
-        assert(not (not check_file_extensions and extensions_json))
+        # extensions. this probably means a mistake.
+        assert(not (not check_file_extensions and extensions_json)), \
+            "specified ``extensions_json`` " \
+            "while ``check_file_extensions`` is false"
         self.__check_file_extensions = check_file_extensions
 
         # json.load() may raise IOError, TypeError, or ValueError
         with open(robots_json or DEFAULT_ROBOTS_JSON, 'r') as f:
-            self.robots = json.load(f)
+            self.__robots = json.load(f)
             f.close()
 
         # same as above
         with open(extensions_json or DEFAULT_EXTENSIONS_JSON, 'r') as f:
-            self.extensions = json.load(f)
+            self.__extensions = json.load(f)
             f.close()
 
         pass  # void return
 
     def detect(self):
         """
-        Returns ``True`` if the request came from a search engine robot and
-        is eligible for interception, ``False`` otherwise.
+        Detects if the request came from a search engine robot and is eligible
+        for interception. The Detector will intercept in cascading order:
+
+          1. on an HTTP or HTTPS protocol
+          2. on an HTTP GET request
+          3. not on any ignored robot user agents (ignored robots take
+             precedence over matched robots)
+          4. not on any route not matching the whitelist
+          5. not on any route matching the blacklist
+          6. not on any invalid file extensions if there is a file extension
+          7. on requests with _escaped_fragment_ query parameter
+          8. on any matched robot user agents
+
+        Returns ``True`` if eligible for interception, ``False`` otherwise.
         """
 
         # do not intercept protocols other than HTTP and HTTPS
-        if not self._get_url_scheme() in ("http", "https", ):
+        if not self.__request.scheme in ("http", "https", ):
             return False
 
         # do not intercept HTTP methods other than GET
-        if not self._get_http_method() in ("GET", ):
+        if not self.__request.method in ("GET", ):
             return False
 
         # user agent may not exist in the HTTP request
-        user_agent = self._get_user_agent() or ""
-        real_path = self._get_decoded_path()
+        user_agent = self.__request.user_agent
 
-        # validate ``robots`` since it is fully exposed to developers
+        # request uri with query string
+        real_path = self.__request.path_qs
+
+        # validate ``robots`` since it can be altered from outside
         if not self._validate_robots():
             raise TypeError("structure of ``robots`` is invalid")
 
         # do not intercept requests from ignored robots
         ignore_regex = u("|").join(
-            [re.escape(r) for r in self.robots.get('ignore', [])])
+            [re.escape(tok) for tok in self.robots.get('ignore', [])])
         if re.match(ignore_regex, user_agent, re.I | re.U):
             return False
 
@@ -144,106 +307,83 @@ class Detector(object):
 
         # detect extensions in order to prevent direct requests to static files
         if self.__check_file_extensions:
-            # validate ``extensions`` since it is fully exposed to developers
+
+            # validate ``extensions`` since it can be altered from outside
             if not self._validate_extensions():
                 raise TypeError("structure of ``extensions`` is invalid")
+
             # create a set of file extensions common for HTML resources
             valid_extensions = set(
                 [s.lower() for s in self.extensions.get('generic', [])])
             valid_extensions.update(
                 [s.lower() for s in self.extensions.get('python', [])])
-            # file extension regex
+
+            # file extension regex. it looks for "/{file}.{ext}" in an URL that
+            # is not preceded by '?' (query parameters) or '#' (hash fragment).
+            # it will acquire the last extension that is present in the URL so
+            # with "/{file1}.{ext1}/{file2}.{ext2}" the ext2 will be the
+            # matched extension. furthermore if a file has multiple extensions
+            # "/{file}.{ext1}.{ext2}", it will only match extension2 because
+            # unix systems don't consider extensions to be metadata, and
+            # windows only considers the last extension to be valid metadata.
+            # Basically the {file}.{ext1} could actually just be the filename.
             extension_regex = u(r"""
                 ^              # start of the string
                 (?:            # begin non-capturing group
                     (?!        # begin negative lookahead
-                       [?#]    # question mark '?' or hash character '#'
+                       [?#]    # question mark '?' or hash '#'
                        .*      # zero or more wildcard characters
                        /       # literal slash '/'
                        [^/?#]+ # {file} - has one or more of any character
-                               #   except '/', '?' or '#'
+                               #     except '/', '?' or '#'
                        \.      # literal dot '.'
                        [^/?#]+ # {extension} - has one or more of any character
-                               #   except '/', '?' or '#'
+                               #     except '/', '?' or '#'
                     )          # end negative lookahead (prevents any '?' or
-                               #   '#' that precedes {file}.{extension} by any
-                               #   characters)
-                    .          # wildcard character
+                               #     '#' that precedes {file}.{extension} by
+                               #     any characters)
+                    .          # one wildcard character
                 )*             # end non-capturing group (captures any number
-                               #   of wildcard characters that passes the
-                               #   negative lookahead)
+                               #     of wildcard characters that passes the
+                               #     negative lookahead)
                 /              # literal slash '/'
                 [^/?#]+        # {file} - has one or more of any character
                                # except forward slash, question mark or hash
                 \.             # literal dot '.'
                 ([^/?#]+)      # {extension} - subgroup has one or more of any
-                               #   character except '/', '?' or '#'
+                               #     character except '/', '?' or '#'
             """)
+
             # match extension regex against decoded path
             matches = re.match(extension_regex, real_path, re.U | re.X)
             if matches:
                 url_extension = matches.group(1).lower()
                 if not url_extension in valid_extensions:
                     return False
-            pass
 
         # detect escaped fragment (since the ignored user agents has already
         # been detected, SnapSearch won't continue the interception loop)
-        if "_escaped_fragment_" in self._get_parsed_qs():
+        if "_escaped_fragment_" in self.__request.GET:
             return True
 
-        # detect requests from matched robots
+        # intercept requests from matched robots
         matched_regex = u("|").join(
-            [re.escape(r) for r in self.robots.get('match', [])])
+            [re.escape(tok) for tok in self.robots.get('match', [])])
         if re.match(matched_regex, user_agent, re.I | re.U):
             return True
 
-        #if no match at all, return false
+        # do not intercept if no match at all
         return False
 
-    def get_encoded_url(self, include_query=True):
-        # url_quote()'ed complete uri.
-        if include_query and "_escaped_fragment_" in self._get_parsed_qs():
-            return self.get_encoded_url(False) + "%(qs)s%(hash)s" % \
-                self._get_real_qs_and_hash_fragment(True)
-        return wsgiref.util.request_uri(self.__request, include_query)
-
-    def _get_decoded_path(self, include_query=True):
-        # url_unquote()'ed request path (relative to site root),
-        # for matching against the white / black list of routes.
-        if include_query and "_escaped_fragment_" in self._get_parsed_qs():
-            return self._get_decoded_path(False) + "%(qs)s%(hash)s" % \
-                self._get_real_qs_and_hash_fragment(False)
-        tup = url_split(wsgiref.util.request_uri(self.__request, True))
-        path = "?".join([tup.path, tup.query]) if include_query else tup.path
-        return url_unquote(path)
-
-    def _get_real_qs_and_hash_fragment(self, encode):
+    def get_encoded_url(self, include_qs=True):
         """
-        Gets the real query string and hash fragment by reversing the Google's
-        ``_escaped_fragment_``_ protocol to the hash bang mode.
-
-.. _: https://developers.google.com/webmasters/ajax-crawling/docs/specification
-
         Keyword arguments:
-        :param encode: ``bool`` to quote the query string or not
 
-        Returns:
-        ``dict`` of query string (``qs``) and hash fragment (``hash``)
+        :param include_qs: ``bool`` to include query string in the URL.
+
+        Returns :RFC:`3986` percent-encoded complete url.
         """
-        query_parameters = self._get_parsed_qs()
-        # compose qs
-        qs = []
-        for k in query_parameters:
-            qs.extend(["{0}={1}".format(k, v) for v in query_parameters[k]
-                       if k != "_escaped_fragment_"])
-        # compose hash
-        hash = query_parameters.get('_escaped_fragment_', [])
-        # codec
-        f = (lambda s: url_unquote(s)) \
-            if encode else (lambda s: url_quote(s))
-        return {'qs': f("?{0}".format("&".join(qs)) if qs else ""),
-                'hash': f("#!{0}".format("".join(hash)) if hash else "")}
+        return self.__request.url
 
     def _validate_robots(self):
         # ``robots`` should be a ``dict`` object, if keys ``ignore`` and
@@ -258,21 +398,5 @@ class Detector(object):
         return isinstance(self.extensions, dict) and \
             isinstance(self.extensions.get('generic', []), list) and \
             isinstance(self.extensions.get('python', []), list)
-
-    def _get_parsed_qs(self):
-        # :PEP:`3333`: ``QUERY_STRING`` MAY be empty or absent.
-        return url_parse_qs(self.__request.get('QUERY_STRING', ""), True)
-
-    def _get_url_scheme(self):
-        # :PEP:`3333`: WSGI-defined variable ``wsgi.url_scheme`` MUST present.
-        return self.__request.get('wsgi.url_scheme', None)
-
-    def _get_http_method(self):
-        # :PEP:`3333`: ``REQUEST_METHOD`` MUST present and be non-empty.
-        return self.__request.get('REQUEST_METHOD', None)
-
-    def _get_user_agent(self):
-        # ``HTTP_USER_AGENT`` MAY be empty or absent.
-        return self.__request.get('HTTP_USER_AGENT', None)
 
     pass
