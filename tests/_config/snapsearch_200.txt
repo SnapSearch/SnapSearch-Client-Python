@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Server: nginx
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Vary: Accept-Encoding
+Set-Cookie: snapsearch_csrf_cookie=15151a26334cd057e6887d78c491ead3; expires=Wed, 05-Mar-2014 06:34:00 GMT; Max-Age=7200; path=/
+Cache-Control: no-cache
+Date: Wed, 05 Mar 2014 04:34:00 GMT
+X-UA-Compatible: IE=Edge
+Access-Control-Allow-Origin: *
+Content-Encoding: gzip
+
+{"content":{"status":200,"headers":[{"name":"Date","value":"Wed, 05 Mar 2014 04:34:01 GMT"},{"name":"Server","value":"Apache\/2.2.15 (CentOS)"},{"name":"Content-Length","value":4},{"name":"Connection","value":"close"},{"name":"Content-Type","value":"text\/plain; charset=UTF-8"}],"message":"Success","html":"<html><head><style type=\"text\/css\">body { background: #fff }<\/style><link rel=\"alternate stylesheet\" type=\"text\/css\" href=\"resource:\/\/gre-resources\/plaintext.css\" title=\"Wrap Long Lines\"><\/head><body><pre>OK!\n<\/pre><\/body><\/html>","screenshot":"","date":1393994042},"code":"success"}

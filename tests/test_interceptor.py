@@ -10,6 +10,9 @@
 
 __all__ = []
 
+import os
+import sys
+
 try:
     from . import _config
     from ._config import unittest
@@ -24,4 +27,8 @@ def test_suite():
 
 
 if __name__ == '__main__':
+    sys.path.insert(0, os.path.join(os.path.curdir, "..", "src"))
+    sys.path.insert(0, os.path.join(os.path.curdir, ".."))
+    sys.path.insert(0, os.path.join(os.path.curdir, "src"))
+    sys.path.insert(0, os.path.join(os.path.curdir))
     unittest.main(defaultTest='test_suite')

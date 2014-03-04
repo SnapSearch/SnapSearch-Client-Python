@@ -1,23 +1,31 @@
 language: python
-python:
+python: 
   - "2.6"
   - "2.7"
   - "3.2"
   - "3.3"
 
-before_install:
-    - pip install pep8 --use-mirrors
-    - "if [[ $TRAVIS_PYTHON_VERSION == *2.6* ]]; then pip install unittest2; fi"
-    - pip install coverage --use-mirrors
+env:
+  global:
+    secure: Cp8iIajczSWw1hX6B/IgEXeumYfdIKM1pjTAATXeDqh8kyYOJvdmlSpqPuH/Vz8MUMM8MOJBGGs6z2nJvnPbP4/5675pWKIa095YfB1VwmL7JVp9PChN3cmCodqOUjZnZWucBTmCk+5zEL3+zE1dwQBCth+oczrGY/viNSzBdqQ=
+  matrix: 
+    - HTTP_LIBRARY=pycurl
+#   - HTTP_LIBRARY=requests
 
-install:
-    - python setup.py install
+before_install: 
+  - pip install pep8 --use-mirrors
+  - if [[ $TRAVIS_PYTHON_VERSION == *2.6* ]]; then pip install unittest2; fi
+  - pip install coverage --use-mirrors
+
+install: 
+  - pip install $HTTP_LIBRARY --use-mirrors
+  - python setup.py install
 
 script:
-    - pep8 *.py
-    - coverage run --omit "*test*" --module tests --verbose
-    - coverage report --show-missing
+  - pep8 *.py
+  - coverage run --omit "*test*" --module tests --verbose
+  - coverage report --show-missing
 
-notifications:
-  email:
-    - pineapple.liu@gmail.com
+notifications: 
+  email: 
+  - pineapple.liu@gmail.com

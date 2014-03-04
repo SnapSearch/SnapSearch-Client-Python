@@ -1,0 +1,10 @@
+HTTP/1.1 400 Bad Request
+Server: nginx
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Set-Cookie: snapsearch_csrf_cookie=c06b9dac9a31737948080c2351c890fe; expires=Wed, 05-Mar-2014 11:39:47 GMT; Max-Age=7200; path=/
+Cache-Control: no-cache
+Date: Wed, 05 Mar 2014 09:39:47 GMT
+
+{"content":{"url":"Url (url) must be a valid url containing http or https as the host and a proper host domain."},"code":"validation_error"}

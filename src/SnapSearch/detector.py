@@ -14,9 +14,9 @@ import re
 import sys
 import wsgiref.util
 
+from ._config import DEBUG, DEFAULT_ROBOTS_JSON, DEFAULT_EXTENSIONS_JSON
 from ._config import json, u, unicode_to_wsgi
 from ._config import url_parse_qs, url_quote, url_split, url_unquote
-from ._config import DEBUG, DEFAULT_ROBOTS_JSON, DEFAULT_EXTENSIONS_JSON
 
 
 class Request(dict):
@@ -48,8 +48,6 @@ class Request(dict):
         Returns ``REQUEST_METHOD`` or ``"N/A"``
         """
         # :PEP:`3333`: ``REQUEST_METHOD`` MUST present and be non-empty.
-        if not 'REQUEST_METHOD' in self:
-            self['REQUEST_METHOD'] = "N/A"
         return self['REQUEST_METHOD']
 
     @property
@@ -93,6 +91,8 @@ class Request(dict):
         # add missing variables from the global OS / CGI environment
         for key, val in os.environ.items():
             self.setdefault(key, unicode_to_wsgi(val))
+        # add missing CGI-defined variables (see :RFC:`3875).
+        self.setdefault('REQUEST_METHOD', "N/A")
         # add missing WSGI-defined variables (see :PEP:`3333`).
         self.setdefault('wsgi.version', (1, 0))
         self.setdefault('wsgi.input', getattr(sys.stdin, 'buffer', sys.stdin))
@@ -150,7 +150,8 @@ class Request(dict):
 
 class Detector(object):
     """
-    Detects if the current request is from a search engine robot
+    Detector detects if the current request is a) from a search engine robot
+    and b) is eligible for interception.
     """
 
     @property
@@ -158,7 +159,7 @@ class Detector(object):
         """
         The ``robots`` property is a ``dict`` of user agent lists:
 
-        .. code:: json
+        .. code-block:: json
 
             {
                 "ignore": [
@@ -180,7 +181,7 @@ class Detector(object):
         """
         The ``extensions`` property is a ``dict`` of valid extensions lists:
 
-        .. code:: json
+        .. code-block:: json
 
             {
                 "generic": [
@@ -375,7 +376,7 @@ class Detector(object):
         # do not intercept if no match at all
         return False
 
-    def get_encoded_url(self, include_qs=True):
+    def get_encoded_url(self):
         """
         Keyword arguments:
 

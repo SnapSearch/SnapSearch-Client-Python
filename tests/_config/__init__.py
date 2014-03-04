@@ -4,8 +4,10 @@
 # Licensed under the MIT license.
 #
 # :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/03
+# :date: 2014/03/05
 #
+
+__all__ = []
 
 import atexit
 import os
@@ -79,8 +81,9 @@ atexit.register(cleanup)
 
 # pre-fetched data
 
-DATA_ROBOTS_JSON = load_data("robots.json").decode("utf-8")
+DATA_CACERT_PEM = load_data("cacert.pem").decode("utf-8")
 DATA_EXTENSIONS_JSON = load_data("extensions.json").decode("utf-8")
+DATA_ROBOTS_JSON = load_data("robots.json").decode("utf-8")
 
 DATA_FIREFOX_REQUEST = load_data("req_firefox.json").decode("utf-8")
 DATA_SAFARI_REQUEST = load_data("req_safari.json").decode("utf-8")

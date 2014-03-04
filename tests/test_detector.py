@@ -5,13 +5,16 @@
 # Licensed under the MIT license.
 #
 # :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/03
+# :date: 2014/03/05
 #
 
 # future import should be the beginning line
 from __future__ import with_statement
 
 __all__ = ['TestDetectorInit', 'TestDetectorMethod', 'TestDetectorProperty', ]
+
+import os
+import sys
 
 try:
     from . import _config
@@ -31,6 +34,8 @@ class TestDetectorInit(unittest.TestCase):
             "robots.json", _config.DATA_ROBOTS_JSON.encode("utf-8"))
         self.EXTERNAL_EXTENSIONS_JSON = _config.save_temp(
             "extensions.json", _config.DATA_EXTENSIONS_JSON.encode("utf-8"))
+        self.NON_EXISTENT_JSON = _config.save_temp(
+            "no_such_file", b"") + ".json"
         pass  # void return
 
     def test_detector_init(self):
@@ -53,6 +58,9 @@ class TestDetectorInit(unittest.TestCase):
         d = Detector(robots_json=self.EXTERNAL_ROBOTS_JSON)
         self.assertTrue(d.robots)
         self.assertTrue("Testbot" in d.robots['match'])
+        # non-existent json file
+        self.assertRaises(IOError, Detector,
+                          robots_json=self.NON_EXISTENT_JSON)
         pass  # void return
 
     def test_detector_init_external_extensions_json(self):
@@ -66,6 +74,10 @@ class TestDetectorInit(unittest.TestCase):
         self.assertRaises(AssertionError, Detector,
                           check_file_extensions=False,
                           extensions_json=self.EXTERNAL_EXTENSIONS_JSON)
+        # non-existent json file
+        self.assertRaises(IOError, Detector,
+                          check_file_extensions=True,
+                          extensions_json=self.NON_EXISTENT_JSON)
         pass  # void return
 
     pass
@@ -232,4 +244,8 @@ def test_suite():
 
 
 if __name__ == '__main__':
+    sys.path.insert(0, os.path.join(os.path.curdir, "..", "src"))
+    sys.path.insert(0, os.path.join(os.path.curdir, ".."))
+    sys.path.insert(0, os.path.join(os.path.curdir, "src"))
+    sys.path.insert(0, os.path.join(os.path.curdir))
     unittest.main(defaultTest='test_suite')
