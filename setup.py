@@ -3,6 +3,9 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 #
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/06
+#
 """
 Setup script for SnapSearch-Client-Python package distribution.
 """
@@ -54,9 +57,10 @@ def get_data_files():
     return data_files
 
 
-# make sure local (up-to-date) package overrides installed (old) package
+# make sure local package takes precedence over installed (old) package
 sys.path.insert(0, join('src', ))
 import SnapSearch as pkg
+
 
 setup(
     name=PACKAGE,

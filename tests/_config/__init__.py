@@ -4,14 +4,16 @@
 # Licensed under the MIT license.
 #
 # :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/05
+# :date: 2014/03/06
 #
 
 __all__ = []
 
+
 import atexit
 import os
 import os.path
+import platform
 import shutil
 import sys
 import tempfile
@@ -81,7 +83,7 @@ atexit.register(cleanup)
 
 # pre-fetched data
 
-DATA_CACERT_PEM = load_data("cacert.pem").decode("utf-8")
+DATA_CA_BUNDLE_PEM = load_data("cacert.pem").decode("utf-8")
 DATA_EXTENSIONS_JSON = load_data("extensions.json").decode("utf-8")
 DATA_ROBOTS_JSON = load_data("robots.json").decode("utf-8")
 
@@ -101,6 +103,8 @@ DATA_ADSBOT_GOOG_POST = load_data("req_adsbot_goog_post.json").decode("utf-8")
 DATA_GOOGBOT_IGNORED = load_data("req_googbot_ignored.json").decode("utf-8")
 DATA_MSNBOT_MATCHED = load_data("req_msnbot_matched.json").decode("utf-8")
 
+VERBOSE = ("-v" in sys.argv or "--verbose" in sys.argv)
+
 
 # preliminary tests
 class TestPackageIntegrity(unittest.TestCase):
@@ -108,14 +112,29 @@ class TestPackageIntegrity(unittest.TestCase):
     Tests package availability and components.
     """
 
+    def test_dependency(self):
+        from SnapSearch.api import backend
+        if VERBOSE:
+            sys.stderr.write("\n    HTTP library using: ``%s (%s)`` ... " %
+                             backend.httpinfo)
+        self.assertTrue(backend.httpinfo)
+        pass
+
     def test_environ(self):
         self.assertTrue(os.path.isdir(DATA_DIR))
         self.assertTrue(os.path.isdir(TEMP_DIR))
+        if VERBOSE:
+            sys.stderr.write("\n    Python: ``%s`` (%s/%s) ..." %
+                             (platform.python_version(),
+                              platform.system(),
+                              platform.machine()))
         pass
 
     def test_package(self):
         import SnapSearch
-        self.assertTrue(SnapSearch.__version__ >= (0, 0, 4))
+        if VERBOSE:
+            sys.stderr.write("\n    SnapSearch: ``%d.%d.%d`` ... " %
+                             SnapSearch.__version__)
         self.assertTrue(isinstance(SnapSearch.Client, object))
         self.assertTrue(isinstance(SnapSearch.Detector, object))
         self.assertTrue(isinstance(SnapSearch.Interceptor, object))

@@ -4,8 +4,9 @@ SnapSearch-Client-Python
 .. image:: https://travis-ci.org/liuyu81/SnapSearch-Client-Python.png?branch=master
    :target: https://travis-ci.org/liuyu81/SnapSearch-Client-Python
 
-.. image:: http://badge.fury.io/py/SnapSearch-Client-Python.png
-   :target: http://badge.fury.io/py/SnapSearch-Client-Python
+.. image:: https://pypip.in/license/SnapSearch-Client-Python/badge.png
+   :target: https://pypi.python.org/pypi/SnapSearch-Client-Python/
+   :alt: License
 
 
 Development

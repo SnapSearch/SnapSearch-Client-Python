@@ -3,6 +3,9 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 #
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/06
+#
 
 __all__ = ['Client', ]
 
@@ -33,7 +36,7 @@ class Client(object):
         :param request_parameters: ``dict`` of parameters to be json-encoded
             and sent to SnapSearch service.
         :param api_url: SnapSearch API url.
-        :param ca_path: absolute path to CA certificate.
+        :param ca_path: absolute path to CA bundle.
         """
 
         self.__api_email = api_email
@@ -44,7 +47,7 @@ class Client(object):
         if not self.__api_url.startswith("https://"):
             raise error.SnapSearchError("``api_url`` uses non-https scheme")
 
-        self.__ca_path = ca_path or api.DEFAULT_CACERT_PEM
+        self.__ca_path = ca_path or api.DEFAULT_CA_BUNDLE_PEM
         if not os.access(self.__ca_path, os.F_OK | os.R_OK):
             raise error.SnapSearchError("``ca_path`` invalid or inaccessable")
 
@@ -68,14 +71,14 @@ class Client(object):
                          key=self.__api_key,
                          payload=payload,
                          url=self.__api_url,
-                         cacert=self.__ca_path)
+                         ca_path=self.__ca_path)
 
         # parse response body as json data
         try:
             # HTTP status code and headers should exist
             assert(r.status and r.headers)
             # body data
-            message = json.loads(r.body)
+            message = json.loads(r.text)
             code = message["code"]
             content = message["content"]
         except:

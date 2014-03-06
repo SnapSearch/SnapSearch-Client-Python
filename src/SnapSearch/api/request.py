@@ -3,8 +3,12 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 #
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/06
+#
 
 __all__ = ['Request', ]
+
 
 import os
 import sys
@@ -19,7 +23,7 @@ from .._config import (url_parse_qs,
 
 class Request(dict):
     """
-    Request extends a CGI / WSGI environ with SnapSearch-defined processing.
+    Extends a CGI / WSGI environ with SnapSearch-defined processing.
     """
 
     @property

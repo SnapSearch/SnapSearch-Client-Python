@@ -3,11 +3,15 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 #
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/06
+#
 
-# future import should be the beginning line
+# future import should come first
 from __future__ import with_statement
 
 __all__ = ['Detector', ]
+
 
 import json
 import os

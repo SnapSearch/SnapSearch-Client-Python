@@ -3,21 +3,18 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 #
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/06
+#
 
 __all__ = ['DEBUG', ]
+
 
 import os
 import sys
 
 
 # language / package compatibility
-
-try:
-    # python 3.x
-    from io import BytesIO
-except ImportError:
-    # python 2.x
-    from StringIO import StringIO as BytesIO
 
 try:
     # python 3.x

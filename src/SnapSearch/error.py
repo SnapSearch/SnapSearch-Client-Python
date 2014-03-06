@@ -3,10 +3,9 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 #
-
-__all__ = ['SnapSearchError',
-           'SnapSearchConnectionError',
-           'SnapSearchDependencyError', ]
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/06
+#
 
 
 class SnapSearchError(Exception):

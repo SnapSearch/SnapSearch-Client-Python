@@ -5,13 +5,16 @@
 # Licensed under the MIT license.
 #
 # :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/05
+# :date: 2014/03/06
 #
 
-# future import should be the beginning line
+# future import should come first
 from __future__ import with_statement
 
-__all__ = ['TestDetectorInit', 'TestDetectorMethod', 'TestDetectorProperty', ]
+__all__ = ['TestDetectorInit',
+           'TestDetectorMethod',
+           'TestDetectorProperty', ]
+
 
 import os
 import sys
@@ -59,25 +62,26 @@ class TestDetectorInit(unittest.TestCase):
         self.assertTrue(d.robots)
         self.assertTrue("Testbot" in d.robots['match'])
         # non-existent json file
-        self.assertRaises(IOError, Detector,
-                          robots_json=self.NON_EXISTENT_JSON)
+        self.assertRaises(
+            IOError, Detector, robots_json=self.NON_EXISTENT_JSON)
         pass  # void return
 
     def test_detector_init_external_extensions_json(self):
         # initialize with external `extensions.json`
         from SnapSearch import Detector
-        d = Detector(check_file_extensions=True,
-                     extensions_json=self.EXTERNAL_EXTENSIONS_JSON)
+        d = Detector(
+            check_file_extensions=True,
+            extensions_json=self.EXTERNAL_EXTENSIONS_JSON)
         self.assertTrue(d.extensions)
         self.assertTrue("test" in d.extensions['generic'])
         # specified `extensions.json` but `check_file_extensions` is False
-        self.assertRaises(AssertionError, Detector,
-                          check_file_extensions=False,
-                          extensions_json=self.EXTERNAL_EXTENSIONS_JSON)
+        self.assertRaises(
+            AssertionError, Detector, check_file_extensions=False,
+            extensions_json=self.EXTERNAL_EXTENSIONS_JSON)
         # non-existent json file
-        self.assertRaises(IOError, Detector,
-                          check_file_extensions=True,
-                          extensions_json=self.NON_EXISTENT_JSON)
+        self.assertRaises(
+            IOError, Detector, check_file_extensions=True,
+            extensions_json=self.NON_EXISTENT_JSON)
         pass  # void return
 
     pass
@@ -109,8 +113,10 @@ class TestDetectorMethod(unittest.TestCase):
 
     def test_detector_detect_bad_request_non_http(self):
         from SnapSearch import Detector
-        d = Detector(request={'SERVER_NAME': "localhost", 'SERVER_PORT': "80",
-                              'wsgi.url_scheme': "non-http", })
+        d = Detector(
+            request={
+                'SERVER_NAME': "localhost", 'SERVER_PORT': "80",
+                'wsgi.url_scheme': "non-http", })
         self.assertFalse(d.detect())  # should *not* be intercepted
         pass  # void return
 
@@ -134,22 +140,25 @@ class TestDetectorMethod(unittest.TestCase):
 
     def test_detector_detect_search_engine_bot_ignored_route(self):
         from SnapSearch import Detector
-        d = Detector(ignored_routes=['^\/other', '^\/ignored', ],
-                     request=self.GOOGBOT_IGNORED)
+        d = Detector(
+            ignored_routes=["^\/other", "^\/ignored", ],
+            request=self.GOOGBOT_IGNORED)
         self.assertFalse(d.detect())  # should *not* be intercepted
         pass  # void return
 
     def test_detector_detect_search_engine_bot_matched_route(self):
         from SnapSearch import Detector
-        d = Detector(matched_routes=['^\/other', '^\/matched', ],
-                     request=self.MSNBOT_MATCHED)
+        d = Detector(
+            matched_routes=["^\/other", "^\/matched", ],
+            request=self.MSNBOT_MATCHED)
         self.assertTrue(d.detect())  # should be intercepted
         pass  # void return
 
     def test_detector_detect_search_engine_bot_non_matched_route(self):
         from SnapSearch import Detector
-        d = Detector(matched_routes=['^\/other', '^\/non_matched_route', ],
-                     request=self.MSNBOT_MATCHED)
+        d = Detector(
+            matched_routes=["^\/other", "^\/non_matched_route", ],
+            request=self.MSNBOT_MATCHED)
         self.assertFalse(d.detect())  # should *not* be intercepted
         pass  # void return
 
@@ -167,22 +176,22 @@ class TestDetectorMethod(unittest.TestCase):
 
     def test_detector_detect_check_file_ext_eligible(self):
         from SnapSearch import Detector
-        d = Detector(check_file_extensions=True,
-                     request=self.ADSBOT_GOOG_HTML)
+        d = Detector(
+            check_file_extensions=True, request=self.ADSBOT_GOOG_HTML)
         self.assertTrue(d.detect())  # should be intercepted
         pass  # void return
 
     def test_detector_detect_check_file_ext_ineligible(self):
         from SnapSearch import Detector
-        d = Detector(check_file_extensions=True,
-                     request=self.ADSBOT_GOOG_MP3)
+        d = Detector(
+            check_file_extensions=True, request=self.ADSBOT_GOOG_MP3)
         self.assertFalse(d.detect())  # should *not* be intercepted
         pass  # void return
 
     def test_detector_detect_check_file_ext_non_existent(self):
         from SnapSearch import Detector
-        d = Detector(check_file_extensions=True,
-                     request=self.ADSBOT_GOOG_HTML)
+        d = Detector(
+            check_file_extensions=True, request=self.ADSBOT_GOOG_HTML)
         self.assertTrue(d.detect())  # should be intercepted
         pass  # void return
 
@@ -197,8 +206,9 @@ class TestDetectorMethod(unittest.TestCase):
         from SnapSearch import Detector
         d = Detector(request=self.ESCAPE_FRAG_VARS)
         self.assertTrue(d.detect())  # should be intercepted
-        self.assertEqual(d.get_encoded_url(), "http://localhost/snapsearch"
-                         "/path1?key1=value1#!/path2?key2=value2")
+        self.assertEqual(
+            d.get_encoded_url(), "http://localhost/snapsearch/path1"
+            "?key1=value1#!/path2?key2=value2")
         pass  # void return
 
 
@@ -225,8 +235,8 @@ class TestDetectorProperty(unittest.TestCase):
 
     def test_detector_prop_update_extension(self):
         from SnapSearch import Detector, SnapSearchError
-        d = Detector(check_file_extensions=True,
-                     request=self.ADSBOT_GOOG_MP3)
+        d = Detector(
+            check_file_extensions=True, request=self.ADSBOT_GOOG_MP3)
         self.assertFalse(d.detect())
         d.extensions['generic'].append("mp3")
         self.assertTrue(d.detect())
@@ -244,6 +254,7 @@ def test_suite():
 
 
 if __name__ == '__main__':
+    # local SnapSearch package takes precedence
     sys.path.insert(0, os.path.join(os.path.curdir, "..", "src"))
     sys.path.insert(0, os.path.join(os.path.curdir, ".."))
     sys.path.insert(0, os.path.join(os.path.curdir, "src"))

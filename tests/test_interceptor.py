@@ -5,10 +5,11 @@
 # Licensed under the MIT license.
 #
 # :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/03
+# :date: 2014/03/06
 #
 
 __all__ = []
+
 
 import os
 import sys
@@ -27,6 +28,7 @@ def test_suite():
 
 
 if __name__ == '__main__':
+    # local SnapSearch package takes precedence
     sys.path.insert(0, os.path.join(os.path.curdir, "..", "src"))
     sys.path.insert(0, os.path.join(os.path.curdir, ".."))
     sys.path.insert(0, os.path.join(os.path.curdir, "src"))

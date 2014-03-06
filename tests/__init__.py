@@ -4,13 +4,14 @@
 # Licensed under the MIT license.
 #
 # :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/03
+# :date: 2014/03/06
 #
 """
 Test Suite for SnapSearch-Client-Python
 """
 
 __all__ = ['test_suite', ]
+
 
 from . import (test_client, test_detector, test_interceptor)
 from ._config import unittest, TestPackageIntegrity

@@ -3,11 +3,20 @@
 # Copyright (c) 2014 SnapSearch
 # Licensed under the MIT license.
 #
+# :author: LIU Yu <liuyu@opencps.net>
+# :date: 2014/03/06
+#
 """
 HTTP Client Middleware Library for SnapSearch
 """
 
-__all__ = ['Client', 'Detector', 'Interceptor', ]
+__all__ = ['Client',
+           'Detector',
+           'Interceptor',
+           'SnapSearchError',
+           'SnapSearchConnectionError',
+           'SnapSearchDependencyError', ]
+
 
 # package metadata
 
@@ -23,7 +32,4 @@ __version__ = (0, 0, 4)
 from .client import Client
 from .detector import Detector
 from .interceptor import Interceptor
-
-from .error import __all__ as __all_error__
-__all__.extend(__all_error__)
 from .error import *
