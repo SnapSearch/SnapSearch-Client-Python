@@ -82,33 +82,34 @@ class TestClientRequest(unittest.TestCase):
         # API credentials
         credentials = os.environ.get('SNAPSEARCH_API_CREDENTIALS', None) or \
             raw_input("API credentials: ")
-        credentials = credentials.split(":", 2)
-        credentials.append("")  # in case the input does not contain ":"
-        self.api_email, self.api_key = credentials[:2]
+        self.api_email, sep, self.api_key = credentials.partition(":")
         pass  # void return
 
     def test_client_request_bad_api_url(self):
-        from SnapSearch import Client, SnapSearchError
+        from SnapSearch import Client, SnapSearchConnectionError
         c = Client(self.api_email, self.api_key, api_url=self.BAD_API_URL)
-        self.assertRaises(SnapSearchError, c.request, self.NORMAL_SITE_URL)
+        self.assertRaises(SnapSearchConnectionError, c.request,
+                          self.NORMAL_SITE_URL)
         pass  # void return
 
     def test_client_request_normal_site_url(self):
         from SnapSearch import Client
         c = Client(self.api_email, self.api_key)
         r = c.request(self.NORMAL_SITE_URL)
-        pass  # void return
-
-    def test_client_request_invalid_site_url(self):
-        from SnapSearch import Client
-        c = Client(self.api_email, self.api_key)
-        r = c.request(self.INVALID_SITE_URL)
+        self.assertEqual(r.get("status", None), 200)
         pass  # void return
 
     def test_client_request_missing_site_url(self):
         from SnapSearch import Client
         c = Client(self.api_email, self.api_key)
         r = c.request(self.NON_EXISTENT_SITE_URL)
+        self.assertEqual(r.get("status", None), 404)
+        pass  # void return
+
+    def test_client_request_validation_error(self):
+        from SnapSearch import Client, SnapSearchError
+        c = Client(self.api_email, self.api_key)
+        self.assertRaises(SnapSearchError, c.request, self.INVALID_SITE_URL)
         pass  # void return
 
     pass

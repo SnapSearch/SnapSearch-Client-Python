@@ -8,7 +8,6 @@ Setup script for SnapSearch-Client-Python package distribution.
 """
 
 PACKAGE = "SnapSearch-Client-Python"
-PY_PACKAGE = "SnapSearch"
 
 import os
 import sys
@@ -31,13 +30,21 @@ def get_data_files():
     if files:
         data_files.append((join(datadir), files))
     #
-    files = glob(join("resources", "*.*"))
+    files = glob(join("docs", "*.*"))
     if files:
-        data_files.append((join(datadir, "resources"), files))
+        data_files.append((join(datadir, "docs"), files))
+    #
+    files = glob(join("examples", "*", "*.*"))
+    if files:
+        data_files.append((join(datadir, "examples"), files))
     #
     files = glob(join("tests", "*.py"))
     if files:
         data_files.append((join(datadir, "tests"), files))
+    #
+    files = glob(join("tests", "_config", "*.*"))
+    if files:
+        data_files.append((join(datadir, "tests", "_config"), files))
     #
     assert data_files
     for install_dir, files in data_files:
@@ -53,9 +60,10 @@ import SnapSearch as pkg
 
 setup(
     name=PACKAGE,
-    packages=[PY_PACKAGE, ],
-    package_dir={PY_PACKAGE: join("src", PY_PACKAGE, ), },
-    package_data={PY_PACKAGE: glob(join("resources", "*.*")), },
+    packages=["SnapSearch", "SnapSearch.api"],
+    package_dir={"SnapSearch": join("src", "SnapSearch", ),
+                 "SnapSearch.api": join("src", "SnapSearch", "api"), },
+    package_data={"SnapSearch.api": ["*.pem", "*.json", ], },
     data_files=get_data_files(),
     version=".".join(map(str, pkg.__version__)),
     author=pkg.__author__,
@@ -81,7 +89,11 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: "
             "CGI Tools/Libraries",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
+        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware",
         "Topic :: Software Development :: Libraries :: Python Modules",
-    ]
+    ],
+    platforms="All",
+    provides=["SnapSearch", ],
+    requires=["pycurl", ]
 )

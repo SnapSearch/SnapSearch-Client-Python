@@ -4,22 +4,20 @@
 # Licensed under the MIT license.
 #
 
-__all__ = ['SNAPSEARCH_API_URL', 'SNAPSEARCH_RES_DIR', 'DEFAULT_CACERT_PEM',
-           'DEFAULT_EXTENSIONS_JSON', 'DEFAULT_ROBOTS_JSON', 'DEBUG', ]
+__all__ = ['DEBUG', ]
 
 import os
-import os.path
 import sys
 
 
 # language / package compatibility
 
 try:
-    # python 2.6+
-    import json
+    # python 3.x
+    from io import BytesIO
 except ImportError:
-    # python 2.5
-    import simplejson as json
+    # python 2.x
+    from StringIO import StringIO as BytesIO
 
 try:
     # python 3.x
@@ -33,13 +31,6 @@ except ImportError:
     from urllib import quote as url_quote
     from urlparse import urlsplit as url_split
     from urllib import unquote as url_unquote
-
-try:
-    # python 3.x
-    from io import BytesIO
-except ImportError:
-    # python 2.x
-    from StringIO import StringIO as BytesIO
 
 # string literal utilities
 
@@ -71,32 +62,6 @@ def unicode_to_wsgi(u):
 def wsgi_to_bytes(s):
     return s.encode("iso-8859-1")
 
-
-# snapsearch global data
-
-SNAPSEARCH_API_URL = "https://snapsearch.io/api/v1/robot"
-
-SNAPSEARCH_RES_DIR = os.path.join(os.path.dirname(__file__), "resources")
-
-
-def confirm_resource(name):
-    """
-    Returns confirmed full path to the specified resource file name.
-    """
-    path = os.path.abspath(os.path.join(SNAPSEARCH_RES_DIR, name))
-    if os.access(path, os.F_OK | os.R_OK):
-        return path
-    return None
-
-
-# default CA certification for SnapSearch client
-DEFAULT_CACERT_PEM = confirm_resource("cacert.pem")
-
-# default extensions data for SnapSearch detector
-DEFAULT_EXTENSIONS_JSON = confirm_resource("extensions.json")
-
-# default robots data for SnapSearch detector
-DEFAULT_ROBOTS_JSON = confirm_resource("robots.json")
-
 # global debugging flag
+
 DEBUG = ('DEBUG' in os.environ) and ('NDEBUG' not in os.environ)

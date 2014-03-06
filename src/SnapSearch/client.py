@@ -6,21 +6,12 @@
 
 __all__ = ['Client', ]
 
+import json
 import os
 import sys
 
-from ._config import SNAPSEARCH_API_URL, DEFAULT_CACERT_PEM
-from ._config import json, wsgi_to_bytes, BytesIO
-
-from .error import SnapSearchError
-
-
-class Response(BytesIO):
-
-    def get_parsed_response(self):
-        return self.getvalue()
-
-    pass
+import SnapSearch.api as api
+import SnapSearch.error as error
 
 
 class Client(object):
@@ -49,13 +40,13 @@ class Client(object):
         self.__api_key = api_key
         self.__request_parameters = request_parameters or {}
 
-        self.__api_url = api_url or SNAPSEARCH_API_URL
+        self.__api_url = api_url or api.SNAPSEARCH_API_URL
         if not self.__api_url.startswith("https://"):
-            raise SnapSearchError("``api_url`` uses non-https scheme")
+            raise error.SnapSearchError("``api_url`` uses non-https scheme")
 
-        self.__ca_path = ca_path or DEFAULT_CACERT_PEM
+        self.__ca_path = ca_path or api.DEFAULT_CACERT_PEM
         if not os.access(self.__ca_path, os.F_OK | os.R_OK):
-            raise SnapSearchError("``ca_path`` invalid or inaccessable")
+            raise error.SnapSearchError("``ca_path`` invalid or inaccessable")
 
         pass  # void return
 
@@ -69,50 +60,39 @@ class Client(object):
 
         Raises ``SnapSearchError``
         """
-
-        # HTTP(S) request payload
         self.__request_parameters['url'] = current_url
-        payload = wsgi_to_bytes(json.dumps(self.__request_parameters))
-        payload_length = len(payload)
+        payload = json.dumps(self.__request_parameters)
 
-        # HTTP(S) request headers
-        headers = ["Content-Type: application/json",
-                   "Content-Length: %d" % payload_length]
+        # dispatch the request to SnapSearch backend
+        r = api.dispatch(email=self.__api_email,
+                         key=self.__api_key,
+                         payload=payload,
+                         url=self.__api_url,
+                         cacert=self.__ca_path)
 
-        # HTTP(S) connection
-        import pycurl
-        c = pycurl.Curl()
-        c.setopt(pycurl.URL, self.__api_url)
-
-        c.setopt(pycurl.CAINFO, self.__ca_path)
-        c.setopt(pycurl.SSL_VERIFYPEER, True)
-        c.setopt(pycurl.SSL_VERIFYHOST, 2)
-
-        c.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_BASIC)
-        c.setopt(pycurl.USERPWD, "%s:%s" % (self.__api_email, self.__api_key))
-        c.setopt(pycurl.POST, True)
-        c.setopt(pycurl.HTTPHEADER, headers)
-        c.setopt(pycurl.POSTFIELDS, payload)
-
-        c.setopt(pycurl.HEADER, True)
-        c.setopt(pycurl.ENCODING, "")
-        c.setopt(pycurl.CONNECTTIMEOUT, 5)
-        c.setopt(pycurl.TIMEOUT, 30)
-
-        r = Response()
-        c.setopt(pycurl.WRITEFUNCTION, r.write)
-        c.setopt(pycurl.FOLLOWLOCATION, True)
-        c.setopt(pycurl.MAXREDIRS, 5)
-
+        # parse response body as json data
         try:
-            c.perform()
-        except pycurl.error as e:
-            raise SnapSearchError(e)
+            # HTTP status code and headers should exist
+            assert(r.status and r.headers)
+            # body data
+            message = json.loads(r.body)
+            code = message["code"]
+            content = message["content"]
+        except:
+            raise error.SnapSearchError(
+                "malformed response from SnapSearch backend")
         else:
+            if code == "success":
+                return content
+            # something wrong with the ``request_parameters``
+            if code == "validation_error":
+                raise error.SnapSearchError(
+                    "validation error from SnapSearch backend, check "
+                    "``request_parameters`` ", code=code, message=message)
+            # unknown error in SnapSearch backend service
             pass
-        finally:
-            c.close()
 
-        return r.get_parsed_response()
+        # nothing we can do
+        return None
 
     pass

@@ -5,13 +5,9 @@
 #
 """
 HTTP Client Middleware Library for SnapSearch
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-:copyright: (c) 2014 by SnapSearch.
-:license: MIT, see LICENSE for more details.
 """
 
-__all__ = ['Client', 'Detector', 'Interceptor', 'SnapSearchError', ]
+__all__ = ['Client', 'Detector', 'Interceptor', ]
 
 # package metadata
 
@@ -20,14 +16,14 @@ __contact__ = "liuyu@opencps.net"
 __copyright__ = 'Copyright (c) 2014 SnapSearch'
 __license__ = "MIT"
 __title__ = "SnapSearch"
-__version__ = (0, 0, 3)
+__version__ = (0, 0, 4)
 
-# import objects from sub-modules and re-export them here for easy access
-
-from ._config import SNAPSEARCH_API_URL
-from ._config import SNAPSEARCH_RES_DIR
+# import objects from sub-modules and re-export them as top-level objects
 
 from .client import Client
 from .detector import Detector
 from .interceptor import Interceptor
-from .error import SnapSearchError
+
+from .error import __all__ as __all_error__
+__all__.extend(__all_error__)
+from .error import *

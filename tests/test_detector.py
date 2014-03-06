@@ -212,7 +212,7 @@ class TestDetectorProperty(unittest.TestCase):
         pass  # void return
 
     def test_detector_prop_update_robots(self):
-        from SnapSearch import Detector
+        from SnapSearch import Detector, SnapSearchError
         d = Detector(request=self.ADSBOT_GOOG_GET)
         # append a robot to the white list
         self.assertTrue(d.detect())
@@ -220,11 +220,11 @@ class TestDetectorProperty(unittest.TestCase):
         self.assertFalse(d.detect())
         # try to damange the structure of ``robots``
         d.robots['ignore'] = None
-        self.assertRaises(TypeError, d.detect)
+        self.assertRaises(SnapSearchError, d.detect)
         pass  # void return
 
     def test_detector_prop_update_extension(self):
-        from SnapSearch import Detector
+        from SnapSearch import Detector, SnapSearchError
         d = Detector(check_file_extensions=True,
                      request=self.ADSBOT_GOOG_MP3)
         self.assertFalse(d.detect())
@@ -232,7 +232,7 @@ class TestDetectorProperty(unittest.TestCase):
         self.assertTrue(d.detect())
         # try to damange the structure of ``extensions``
         d.extensions['generic'] = None
-        self.assertRaises(TypeError, d.detect)
+        self.assertRaises(SnapSearchError, d.detect)
         pass  # void return
 
     pass

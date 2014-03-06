@@ -23,7 +23,7 @@ install:
 
 script:
   - pep8 *.py
-  - coverage run --omit "*test*" --module tests --verbose
+  - coverage run --omit "*test*,*requests*,*curl*,*pkg*" --module tests --verbose
   - coverage report --show-missing
 
 notifications: 

@@ -115,11 +115,30 @@ class TestPackageIntegrity(unittest.TestCase):
 
     def test_package(self):
         import SnapSearch
-        self.assertTrue(SnapSearch.__version__ >= (0, 0, 3))
+        self.assertTrue(SnapSearch.__version__ >= (0, 0, 4))
         self.assertTrue(isinstance(SnapSearch.Client, object))
         self.assertTrue(isinstance(SnapSearch.Detector, object))
         self.assertTrue(isinstance(SnapSearch.Interceptor, object))
         self.assertTrue(isinstance(SnapSearch.SnapSearchError, object))
         pass
+
+    def test_types_error_base(self):
+        from SnapSearch import SnapSearchError
+        e = SnapSearchError("base error", code=100)
+        self.assertEqual(e.code, 100)
+        self.assertRaises(AttributeError, lambda: e.no_such_attr)
+        pass  # void return
+
+    def test_types_error_connection(self):
+        from SnapSearch import SnapSearchConnectionError
+        ce = SnapSearchConnectionError("connection error", status=404)
+        self.assertEqual(ce.status, 404)
+        pass  # void return
+
+    def test_types_error_dependency(self):
+        from SnapSearch import SnapSearchDependencyError
+        de = SnapSearchDependencyError("import error", requires=["pycurl", ])
+        self.assertEqual(de.requires[0], "pycurl")
+        pass  # void return
 
     pass
