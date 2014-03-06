@@ -78,10 +78,9 @@ class Client(object):
             # HTTP status code and headers should exist
             assert(r.status and r.headers)
             # body data
-            message = json.loads(r.text)
-            code = message["code"]
-            content = message["content"]
-        except:
+            code = r.body["code"]
+            content = r.body["content"]
+        except Exception as e:
             raise error.SnapSearchError(
                 "malformed response from SnapSearch backend")
         else:
@@ -91,7 +90,7 @@ class Client(object):
             if code == "validation_error":
                 raise error.SnapSearchError(
                     "validation error from SnapSearch backend, check "
-                    "``request_parameters`` ", code=code, message=message)
+                    "``request_parameters`` ", code=code, message=r.body)
             # unknown error in SnapSearch backend service
             pass
 

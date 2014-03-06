@@ -32,22 +32,22 @@ class Response(object):
         return self.__headers
 
     @property
-    def text(self):
+    def body(self):
         """
         Content of response
         """
-        if not self.__text:
-            self.__text = self.__raw_response.get('text', "")
-        return self.__text
+        if not self.__body:
+            self.__body = self.__raw_response.get('body', "")
+        return self.__body
 
     # private properties
-    __slots__ = ['__raw_response', '__status', '__headers', '__text', ]
+    __slots__ = ['__raw_response', '__status', '__headers', '__body', ]
 
     def __init__(self, **kwds):
         super(Response, self).__init__()
         self.__status = None
         self.__headers = None
-        self.__text = None
+        self.__body = None
         self.__raw_response = kwds
         pass  # void return
 

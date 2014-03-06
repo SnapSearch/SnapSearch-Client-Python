@@ -52,11 +52,11 @@ else:
 enc, esc = sys.getfilesystemencoding(), "surrogateescape"
 
 
-def unicode_to_wsgi(u):
+def n(u):
     return u.encode(enc, esc).decode("iso-8859-1")
 
 
-def wsgi_to_bytes(s):
+def b(s):
     return s.encode("iso-8859-1")
 
 # global debugging flag

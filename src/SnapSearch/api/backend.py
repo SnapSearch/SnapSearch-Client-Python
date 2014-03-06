@@ -10,12 +10,13 @@
 __all__ = ['dispatch', ]
 
 
+import json
 import os
 import sys
 
 import SnapSearch.error as error
 
-from .._config import u, wsgi_to_bytes
+from .._compat import b
 from .response import Response
 
 
@@ -28,7 +29,7 @@ def _dispatch_via_requests(**kwds):
     import requests
 
     # HTTPS POST request
-    payload = wsgi_to_bytes(kwds['payload'])
+    payload = b(kwds['payload'])
     headers = {"Content-Type": "application/json",
                "Content-Length": len(payload)}
 
@@ -46,7 +47,8 @@ def _dispatch_via_requests(**kwds):
     except Exception as e:
         raise error.SnapSearchConnectionError(e)
     else:
-        return Response(status=r.status_code, headers=r.headers, text=r.text)
+        return Response(status=r.status_code, headers=r.headers,
+                        body=json.loads(r.text))
     finally:
         s.close()
 
@@ -65,7 +67,7 @@ def _dispatch_via_pycurl(**kwds):
     c.setopt(pycurl.URL, kwds['url'])
 
     # HTTPS POST request
-    payload = wsgi_to_bytes(kwds['payload'])
+    payload = b(kwds['payload'])
     headers = ["Content-Type: application/json",
                "Content-Length: %d" % len(payload)]
 
@@ -90,29 +92,29 @@ def _dispatch_via_pycurl(**kwds):
 
     try:
         c.perform()
-        # response status
         eos = buffer.find(b"\r\n")  # end of status line
-        strip = lambda b: bytes(b).strip()
+        eoh = buffer.find(b"\r\n\r\n")  # end of header lines
+        # response status
+        strip = lambda b: bytes(b.strip())
         preamble = tuple(map(strip, buffer[:eos].split(b" ", 2)))
         if len(preamble) < 2:
             raise error.SnapSearchError(
                 "malformed response from SnapSearch backend")
         status_code = int(preamble[1])
         # response headers
-        eoh = buffer.find(b"\r\n\r\n")  # end of header lines
-        strip_kv = lambda kv: (kv[0].strip().lower().decode("utf-8"),
-                               kv[1].strip().decode("utf-8"))
-        split_cma = lambda b: strip_kv(bytes(b).split(b":", 1))
+        norm_hdr = lambda kv: (bytes(kv[0].strip().lower()),
+                               bytes(kv[1].strip()))
+        split_cma = lambda b: norm_hdr(b.split(b":", 1))
         headers = dict(map(split_cma, buffer[eos + 2: eoh].splitlines()))
         # response content
-        text = bytes(buffer[eoh + 4:]).strip().decode("utf-8")
+        text = json.loads(bytes(buffer[eoh + 4:].strip()).decode())
     except pycurl.error as e:
         raise error.SnapSearchConnectionError(e)
-    except:
+    except Exception as e:
         raise error.SnapSearchError(
             "malformed response from SnapSearch backend")
     else:
-        return Response(status=status_code, headers=headers, text=text)
+        return Response(status=status_code, headers=headers, body=text)
     finally:
         c.close()
 

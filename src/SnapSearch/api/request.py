@@ -14,11 +14,10 @@ import os
 import sys
 import wsgiref.util
 
-from .._config import (url_parse_qs,
+from .._compat import (url_parse_qs,
                        url_quote,
                        url_split,
-                       url_unquote,
-                       unicode_to_wsgi, )
+                       url_unquote, )
 
 
 class Request(dict):
@@ -90,9 +89,6 @@ class Request(dict):
     def __init__(self, environ={}):
         # make a (shallow) copy of the environ
         super(Request, self).__init__(environ)
-        # add missing variables from the global OS / CGI environment
-        for key, val in os.environ.items():
-            self.setdefault(key, unicode_to_wsgi(val))
         # add missing CGI-defined variables (see :RFC:`3875).
         self.setdefault('REQUEST_METHOD', "N/A")
         # add missing WSGI-defined variables (see :PEP:`3333`).

@@ -21,7 +21,7 @@ import sys
 import SnapSearch.api as api
 import SnapSearch.error as error
 
-from ._config import u
+from ._compat import u
 
 
 class Detector(object):
