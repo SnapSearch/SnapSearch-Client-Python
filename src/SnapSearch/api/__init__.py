@@ -1,36 +1,36 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2014 SnapSearch
-# Licensed under the MIT license.
-#
-# :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/06
-#
 """
-SnapSearch Backend Service Abstraction Layer
+    Backend Service Abstraction Layer for SnapSearch
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
 """
 
 __all__ = ['SNAPSEARCH_API_URL',
+           'SNAPSEARCH_API_ACCEPT_ENCODING',
            'SNAPSEARCH_API_FOLLOW_REDIRECT',
            'SNAPSEARCH_API_TIMEOUT',
            'DEFAULT_CA_BUNDLE_PEM',
            'DEFAULT_EXTENSIONS_JSON',
            'DEFAULT_ROBOTS_JSON',
-           'AnyEnviron',
-           'Response',
-           'dispatch', ]
+           'dispatch',
+           'AnyEnv',
+           'Response', ]
 
 
 import os
 import os.path
 import sys
 
-# snapsearch api resource bundle
+# snapsearch api parameters
 
 SNAPSEARCH_API_URL = "https://snapsearch.io/api/v1/robot"
-
-SNAPSEARCH_API_FOLLOW_REDIRECT = True
+SNAPSEARCH_API_FOLLOW_REDIRECT = False
 SNAPSEARCH_API_TIMEOUT = 30
+
+
+# snapsearch api resource bundle
 
 RESOURCE_DIR = os.path.dirname(__file__)
 
@@ -55,7 +55,10 @@ DEFAULT_ROBOTS_JSON = confirm_resource("robots.json")
 
 # snapsearch api objects and methods
 
-from .environ import AnyEnviron
+from .backend import dispatch, httpinfo as __httpinfo
+from .environ import AnyEnv
 from .response import Response
 
-from .backend import dispatch
+# snapsearch api constants
+
+SNAPSEARCH_API_ACCEPT_ENCODING = ", ".join(__httpinfo[2])

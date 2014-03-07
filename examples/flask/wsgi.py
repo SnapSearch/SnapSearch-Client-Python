@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+    SnapSearch.wsgi
+    ~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
+"""
+
 __all__ = ['Middleware', ]
 
 

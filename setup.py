@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-#
-# Copyright (c) 2014 SnapSearch
-# Licensed under the MIT license.
-#
-# :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/06
-#
+# -*- coding: utf-8 -*-
 """
-Setup script for SnapSearch-Client-Python package distribution.
+    SnapSearch-Client-Python
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Pythonic HTTP Client and Middleware for `SnapSearch`_.
+
+    .. _`SnapSearch`: https://snapsearch.io/
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
 """
 
 PACKAGE = "SnapSearch-Client-Python"
@@ -75,7 +77,7 @@ setup(
     author=pkg.__author__,
     license=pkg.__license__,
     author_email=pkg.__contact__,
-    description=pkg.__doc__,
+    description="Pythonic HTTP Client and Middleware Library for SnapSearch",
     long_description=open("README.rst").read(),
     classifiers=[
         "Development Status :: 3 - Alpha",

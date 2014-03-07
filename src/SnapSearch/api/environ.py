@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2014 SnapSearch
-# Licensed under the MIT license.
-#
-# :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/06
-#
+"""
+    SnapSearch.api.environ
+    ~~~~~~~~~~~~~~~~~~~~~~
 
-__all__ = ['AnyEnviron', ]
+    wrapper for CGI-style ``environ`` (``dict`` of HTTP request variables)
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
+"""
+
+__all__ = ['AnyEnv', ]
 
 
 import os
 import sys
 import wsgiref.util
 
-from .._compat import (url_parse_qs,
-                       url_quote,
-                       url_split,
-                       url_unquote, )
+from .._compat import (
+    url_parse_qs,
+    url_quote,
+    url_split,
+    url_unquote, )
 
 
-class AnyEnviron(object):
+class AnyEnv(object):
     """
-    Wraps a CGI-style ``environ`` with WSGI-defined variables and properties in
-    SnapSearch-specified format and encoding.
+    Wraps a CGI-style ``environ`` (builtin Python ``dict``) with WSGI-defined
+    variables and properties in SnapSearch-specified format and encoding.
     """
 
     @property

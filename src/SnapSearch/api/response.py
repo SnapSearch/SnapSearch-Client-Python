@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2014 SnapSearch
-# Licensed under the MIT license.
-#
-# :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/06
-#
+"""
+    SnapSearch.api.response
+    ~~~~~~~~~~~~~~~~~~~~~~~
+
+    wrapper for response from SnapSearch backend service
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
+"""
 
 
 class Response(object):
@@ -16,7 +18,7 @@ class Response(object):
     @property
     def status(self):
         """
-        HTTP status code
+        HTTP status code (``int``)
         """
         if not self.__status:
             self.__status = int(self.__raw_response.get('status', 0))
@@ -25,7 +27,7 @@ class Response(object):
     @property
     def headers(self):
         """
-        HTTP headers as ``dict``
+        HTTP headers (``dict``)
         """
         if not self.__headers:
             self.__headers = self.__raw_response.get('headers', None)
@@ -34,7 +36,7 @@ class Response(object):
     @property
     def body(self):
         """
-        Content of response
+        response body (``dict``)
         """
         if not self.__body:
             self.__body = self.__raw_response.get('body', "")

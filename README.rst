@@ -40,10 +40,6 @@ To install with ``pip``, simply:
 
     $ pip install SnapSearch-Client-Python
 
-
-.. code-block:: bash
-
-
 Or, if you prefer ``easy_install``:
 
 .. code-block:: bash

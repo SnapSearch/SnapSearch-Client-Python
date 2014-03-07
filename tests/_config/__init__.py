@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2014 SnapSearch
-# Licensed under the MIT license.
-#
-# :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/06
-#
+"""
+    SnapSearch.tests._config
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
+"""
 
 __all__ = []
 
@@ -128,8 +128,8 @@ class TestPackageIntegrity(unittest.TestCase):
         from SnapSearch.api import backend
         if VERBOSE:
             sys.stderr.write("\n    HTTP library using: ``%s (%s)`` ... " %
-                             backend.httpinfo)
-        self.assertTrue(backend.httpinfo)
+                             backend.httpinfo[:2])
+        self.assertTrue(backend.httpinfo[0])
         pass
 
     def test_environ(self):

@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2014 SnapSearch
-# Licensed under the MIT license.
-#
-# :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/06
-#
+"""
+    SnapSearch.tests.test_detector
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Tests SnapSearch.detector
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
+"""
 
 # future import should come first
 from __future__ import with_statement

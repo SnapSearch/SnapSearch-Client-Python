@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2014 SnapSearch
-# Licensed under the MIT license.
-#
-# :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/06
-#
 """
-Test Suite for SnapSearch-Client-Python
+    SnapSearch.tests
+    ~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
 """
 
 __all__ = ['test_suite', ]

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2014 SnapSearch
-# Licensed under the MIT license.
-#
-# :author: LIU Yu <liuyu@opencps.net>
-# :date: 2014/03/06
-#
+"""
+    SnapSearch.detector
+    ~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2014 by SnapSearch.
+    :license: MIT, see LICENSE for more details.
+"""
 
 # future import should come first
 from __future__ import with_statement
@@ -143,7 +143,7 @@ class Detector(object):
         """
 
         # wrap the incoming HTTP request (CGI-style environ)
-        environ = api.AnyEnviron(request)
+        environ = api.AnyEnv(request)
 
         # do not intercept protocols other than HTTP and HTTPS
         if not environ.scheme in ("http", "https", ):
