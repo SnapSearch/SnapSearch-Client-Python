@@ -12,8 +12,8 @@
 from __future__ import with_statement
 
 __all__ = ['TestDetectorInit',
-           'TestDetectorMethod',
-           'TestDetectorProperty', ]
+           'TestDetectorDetect',
+           'TestDetectorProperties', ]
 
 
 import os
@@ -29,7 +29,7 @@ except (ValueError, ImportError):
 
 class TestDetectorInit(unittest.TestCase):
     """
-    Tests different ways to initialize a Detector object.
+    Tests ``Detector.__init__()`` with different parameter combinations.
     """
     def setUp(self):
         # save local data to temporary files
@@ -87,9 +87,9 @@ class TestDetectorInit(unittest.TestCase):
     pass
 
 
-class TestDetectorMethod(unittest.TestCase):
+class TestDetectorDetect(unittest.TestCase):
     """
-    Test ``detect()`` and ``get_encoded_url()`` with different requests.
+    Test ``Detector.detect()`` with different requests.
     """
     def setUp(self):
         self.FIREFOX_REQUEST = json.loads(_config.DATA_FIREFOX_REQUEST)
@@ -117,14 +117,14 @@ class TestDetectorMethod(unittest.TestCase):
         d = Detector()
         r = {'SERVER_NAME': "localhost", 'SERVER_PORT': "80",
              'wsgi.url_scheme': "non-http", }
-        self.assertFalse(d.detect())  # should *not* be intercepted
+        self.assertFalse(d.detect(r))  # should *not* be intercepted
         pass  # void return
 
     def test_detector_detect_normal_browser_firefox(self):
         from SnapSearch import Detector
         d = Detector()
         r = self.FIREFOX_REQUEST
-        self.assertFalse(d.detect())  # should *not* be intercepted
+        self.assertFalse(d.detect(r))  # should *not* be intercepted
         pass  # void return
 
     def test_detector_detect_normal_browser_safari(self):
@@ -197,25 +197,23 @@ class TestDetectorMethod(unittest.TestCase):
         self.assertTrue(d.detect(r))  # should be intercepted
         pass  # void return
 
-    def test_detector_get_encoded_url_escape_frag_null(self):
+    def test_detector_detect_return_escape_frag_null(self):
         from SnapSearch import Detector
         d = Detector()
         r = self.ESCAPE_FRAG_NULL
-        self.assertTrue(d.detect(r),
-                        "http://localhost/snapsearch")  # should be intercepted
+        self.assertEqual(d.detect(r), "http://localhost/snapsearch")
         pass  # void return
 
-    def test_detector_get_encoded_url_escape_frag_vars(self):
+    def test_detector_detect_return_escape_frag_vars(self):
         from SnapSearch import Detector
         d = Detector()
         r = self.ESCAPE_FRAG_VARS
-        self.assertTrue(
-            d.detect(r), "http://localhost/snapsearch/path1?key1=value1"
-            "#!/path2?key2=value2")  # should be intercepted
+        self.assertEqual(d.detect(r), "http://localhost/snapsearch/path1"
+                                      "?key1=value1#!/path2?key2=value2")
         pass  # void return
 
 
-class TestDetectorProperty(unittest.TestCase):
+class TestDetectorProperties(unittest.TestCase):
     """
     Tests updating ``robots`` and ``extensions`` of a Detector object.
     """

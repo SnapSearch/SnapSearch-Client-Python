@@ -15,11 +15,10 @@ if __name__ == '__main__':
     api_email, sep, api_key = credentials.partition(":")
 
     # initialize Client and Detector
-    from SnapSearch import Client, Detector
-    client = Client(api_email, api_key)
-    detector = Detector()
+    from SnapSearch import Client, Detector, Interceptor
+    interceptor = Interceptor(Client(api_email, api_key), Detector())
 
     # hook the middleware
-    from wsgi import Middleware
-    app.wsgi_app = wsgi.Middleware(app.wsgi_app, client, detector)
+    import wsgi
+    app.wsgi_app = wsgi.Middleware(app.wsgi_app, interceptor)
     app.run(host="127.0.0.1", port=5000)

@@ -8,7 +8,7 @@
 # :date: 2014/03/06
 #
 
-__all__ = []
+__all__ = ['TestInterceptorMethods', ]
 
 
 import os
@@ -20,6 +20,23 @@ try:
 except (ValueError, ImportError):
     import _config
     from _config import unittest
+
+
+class TestInterceptorMethods(unittest.TestCase):
+
+    def setUp(self):
+        pass  # void return
+
+    def test_interceptor_init(self):
+        pass  # void return
+
+    def test_interceptor_intercept(self):
+        pass  # void return
+
+    def test_interceptor_callback(self):
+        pass  # void return
+
+    pass
 
 
 def test_suite():

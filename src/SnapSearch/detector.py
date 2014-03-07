@@ -115,9 +115,9 @@ class Detector(object):
 
         pass  # void return
 
-    def detect(self, environ={}):
+    def detect(self, environ):
         """
-        Keyword arguments:
+        Keyword argument(s):
 
         :param environ: ``dict`` of HTTP request variables.
 
@@ -134,8 +134,8 @@ class Detector(object):
           7. on requests with _escaped_fragment_ query parameter
           8. on any matched robot user agents
 
-        Returns :RFC:`3986` percent-encoded complete url if eligible for
-        interception. ``None`` otherwise.
+        Returns :RFC:`3986` percent-encoded full url if eligible for
+        interception, ``None`` otherwise.
         """
 
         # wrap incoming request as a Request object

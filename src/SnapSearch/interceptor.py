@@ -34,24 +34,67 @@ class Interceptor(object):
         """
         return self.__detector
 
-    # private properties
-    __slots__ = ['__detector', '__client', '__before', '__after', ]
+    @property
+    def before_intercept(self):
+        """
+        Before interception callback
+        """
+        return self.__start
 
-    def __init__(self, client, detector):
+    @property
+    def after_intercept(self):
+        """
+        After interception callback
+        """
+        return self.__end
+
+    # private properties
+    __slots__ = ['__detector', '__client', '__start', '__end', ]
+
+    def __init__(self, client, detector, before_intercept=None,
+                 after_intercept=None):
         """
         Keyword arguments:
 
         :param client: Client object
         :param detector: Detector object
         """
-        assert(isinstance(client, Client) and isinstance(detector, Detector))
+
+        assert(isinstance(client, Client))
+        assert(isinstance(detector, Detector))
         self.__client = client
         self.__detector = detector
+        self.__start = before_intercept if callable(before_intercept) else None
+        self.__end = after_intercept if callable(after_intercept) else None
+
         pass  # void return
 
-    def intercept(self):
+    def intercept(self, environ):
         """
+        Keyword argument(s):
+
+        :param environ: ``dict`` of HTTP request variables.
+
+        Returns the snapshot if the request was scraped
         """
-        return None
+
+        raw_current_url = self.detector.detect(environ)
+        if not raw_current_url:
+            # request not eligible for interception
+            return None
+
+        # pre-interception callback
+        if callable(self.before_intercept):
+            result = self.before_intercept(raw_current_url)
+            if result != raw_current_url:
+                return result
+
+        response = self.client.request(raw_current_url)
+
+        # post-interception callback
+        if callable(self.after_intercept):
+            self.after_intercept(raw_current_url, response)
+
+        return response
 
     pass

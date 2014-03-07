@@ -7,11 +7,19 @@
 # :date: 2014/03/06
 #
 
-__all__ = ['DEBUG', ]
+__all__ = ['DEBUG', 'PY2', ]
 
 
 import os
 import sys
+
+# global directives
+
+# debugging mode flag
+DEBUG = ('DEBUG' in os.environ) and ('NDEBUG' not in os.environ)
+
+# python 2.x flag
+PY2 = (sys.version_info[0] == 2)
 
 
 # language / package compatibility
@@ -34,7 +42,7 @@ except ImportError:
 # python 3.2 dropped explicit unicode literal, i.e., u"str" being illegal, so
 # we need a helper function u("str") to emulate u"str" (see :PEP:`414`).
 
-if sys.version_info[0] == 2:
+if PY2:
 
     def u(s):
         return unicode(s, "unicode_escape")
@@ -59,6 +67,8 @@ def n(u):
 def b(s):
     return s.encode("iso-8859-1")
 
-# global debugging flag
 
-DEBUG = ('DEBUG' in os.environ) and ('NDEBUG' not in os.environ)
+# other useful helper functions
+
+def identity(any):
+    return any

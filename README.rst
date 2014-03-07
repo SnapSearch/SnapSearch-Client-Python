@@ -22,9 +22,8 @@ https://github.com/SnapSearch/SnapSearch-Clients
 Installation
 ------------
 
-Attention: This is the development repo of the Pythonic ``SnapSearch-Client``.
-We are half way towards the first alpha release. In its current status, the
-code base is *not* ready for use in a production system.
+Attention: The Pythonic ``SnapSearch-Client`` is currently undergoing **alpha**
+test. Consider the code base *not* suitable for use in a production system!
 
 To install with ``pip``, simply:
 
