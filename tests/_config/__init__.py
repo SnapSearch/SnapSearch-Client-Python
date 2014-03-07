@@ -106,6 +106,18 @@ DATA_MSNBOT_MATCHED = load_data("req_msnbot_matched.json").decode("utf-8")
 VERBOSE = ("-v" in sys.argv or "--verbose" in sys.argv)
 
 
+# pre-configured data
+
+def get_api_credentials(user_input=True, prompt="API credentials: "):
+    """
+    Gets api credentials from environment variables, and optionally from user.
+    """
+    credentials = os.environ.get('SNAPSEARCH_API_CREDENTIALS', None) or \
+        (user_input and raw_input(prompt))
+    email, sep, key = credentials.partition(":")
+    return email, key
+
+
 # preliminary tests
 class TestPackageIntegrity(unittest.TestCase):
     """

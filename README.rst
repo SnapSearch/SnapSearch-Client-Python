@@ -1,3 +1,4 @@
+========================
 SnapSearch-Client-Python
 ========================
 
@@ -20,10 +21,18 @@ https://github.com/SnapSearch/SnapSearch-Clients
 
 
 Installation
-------------
+============
 
-Attention: The Pythonic ``SnapSearch-Client`` is currently undergoing **alpha**
-test. Consider the code base *not* suitable for use in a production system!
+**WARNING**: The Pythonic ``SnapSearch-Client`` is currently undergoing
+**alpha** test. Please beware that the code base is *not yet* suitable for use
+in a production system.
+
+The Pythonic ``SnapSearch-Client`` requires a dependable HTTP library that can
+verify SSL certificates for HTTPS requests. Normally, this means you need to
+have either `requests`_ or `PycURL`_ installed.
+
+.. _`PycURL`: http://pycurl.sourceforge.net/
+.. _`requests`: http://python-requests.org/
 
 To install with ``pip``, simply:
 
@@ -31,20 +40,24 @@ To install with ``pip``, simply:
 
     $ pip install SnapSearch-Client-Python
 
+
+.. code-block:: bash
+
+
 Or, if you prefer ``easy_install``:
 
 .. code-block:: bash
 
     $ easy_install SnapSearch-Client-Python
 
-The Pythonic ``SnapSearch-Client`` requires an HTTP library to verify SSL
-certificates for HTTPS requests. It seamlessly supports any of PycURL_ and
-requests_. You need to have one of them installled.
-
-.. _PycURL: http://pycurl.sourceforge.net/
-.. _requests: http://python-requests.org/
-
 
 Usage
------
+=====
 
+TODO
+
+
+Contact
+=======
+
+TODO
