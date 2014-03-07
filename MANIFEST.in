@@ -3,6 +3,6 @@ include LICENSE
 include MANIFEST.in
 include setup.py
 recursive-include docs *.*
-recursive-include examples *.*
+recursive-include examples *.py *.rst
 recursive-include src *.py *.json *.pem
 recursive-include tests *.py *.json *.pem *.txt

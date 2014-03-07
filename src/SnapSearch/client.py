@@ -19,7 +19,8 @@ import SnapSearch.error as error
 
 class Client(object):
     """
-    Client contacts SnapSearch service and retrieves the snapshot.
+    ``Client`` dispatches the SnapSearch backend service and retrieves a
+    snapshot of the URL being accessed by the incoming HTTP request.
     """
 
     # private properties
@@ -29,14 +30,19 @@ class Client(object):
     def __init__(self, api_email, api_key, request_parameters={},
                  api_url=None, ca_path=None):
         """
-        Keyword arguments:
+        Required arguments:
 
-        :param api_email: email as user name for HTTP basic authentication.
-        :param api_key: key as password for HTTP basic authentication.
-        :param request_parameters: ``dict`` of parameters to be json-encoded
-            and sent to SnapSearch service.
-        :param api_url: SnapSearch API url.
-        :param ca_path: absolute path to CA bundle.
+        :param api_email: registered email as username for authentication
+        against the SnapSearch backend service.
+        :param api_key: api key as password for authentication against the
+        SnapSearch backend service.
+
+        Optional arguments:
+
+        :param request_parameters: ``dict`` of parameters to be json-serialized
+            and sent to SnapSearch backend service.
+        :param api_url: URL to SnapSearch backend service.
+        :param ca_path: absolute path to an external CA bundle file.
         """
 
         self.__api_email = api_email
@@ -53,15 +59,15 @@ class Client(object):
 
         pass  # void return
 
-    def request(self, current_url):
+    def __call__(self, current_url):
         """
-        Keyword arguments:
+        Required argument(s):
 
-        :param current_url: current URL that the robot is going to accessing.
+        :param current_url: current URL that the search engine robot is
+            attempting to access.
 
-        Returns response ``dict`` from SnapSearch
-
-        Raises ``SnapSearchError``
+        Returns the response from SnapSearch backend service. Raises
+        ``SnapSearchError`` on failure.
         """
         self.__request_parameters['url'] = current_url
         payload = json.dumps(self.__request_parameters)

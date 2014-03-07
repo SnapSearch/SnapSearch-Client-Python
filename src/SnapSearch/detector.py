@@ -26,14 +26,14 @@ from ._compat import u
 
 class Detector(object):
     """
-    Detector detects if the current request is a) from a search engine robot
-    and b) is eligible for interception.
+    ``Detector`` detects if an HTTP request is a) from a search engine robot,
+    and b) the targeted resource is eligible for interception.
     """
 
     @property
     def robots(self):
         """
-        The ``robots`` property is a ``dict`` of user agent lists:
+        ``dict`` of ``list``'s of user agents from search engine robots:
 
         .. code-block:: json
 
@@ -46,16 +46,15 @@ class Detector(object):
                 ]
             }
 
-        The ``ignore`` list takes precedence over the ``match`` list when
-        running the detection algorithm. You can change each list to customise
-        ignored and matched robots.
+        Can be changed to customize ignored and matched search engine robots.
+        The ``ignore`` list takes precedence over the ``match`` list.
         """
         return self.__robots
 
     @property
     def extensions(self):
         """
-        The ``extensions`` property is a ``dict`` of valid extensions lists:
+        ``dict`` of ``list``'s of valid file extensions:
 
         .. code-block:: json
 
@@ -68,13 +67,13 @@ class Detector(object):
                 ]
             }
 
-        You can change each list to customise valid file extensions.
+        Can be changed to customize valid file extensions.
         """
         return self.__extensions
 
     # private properties
-    __slots__ = ['__ignored_routes', '__matched_routes', '__request',
-                 '__check_file_extensions', '__extensions', '__robots', ]
+    __slots__ = ['__check_file_extensions', '__extensions', '__ignored_routes',
+                 '__matched_routes', '__robots', ]
 
     def __init__(self,
                  ignored_routes=[],
@@ -83,14 +82,17 @@ class Detector(object):
                  robots_json=None,
                  extensions_json=None):
         """
-        Keyword arguments:
+        Optional arguments:
 
-        :param ignored_routes: ``list|tuple`` of blacklisted route regexes.
-        :param matched_routes: ``list|tuple`` of whitelisted route regexes.
-        :param check_file_extensions: ``bool`` to check if the URL is going to
-            a static file resource that should not be intercepted.
-        :param robots_json: absolute path to a ``robots.json`` file.
-        :param extensions_json: absolute path to an ``extensions.json`` file.
+        :param ignored_routes: ``list`` or ``tuple`` of blacklisted route
+            regular expressions.
+        :param matched_routes: ``list`` or ``tuple`` of whitelisted route
+            regular expressions.
+        :param check_file_extensions: ``bool`` to check if the URL is going
+            to a static file resource that should not be intercepted.
+        :param robots_json: absolute path to an external ``robots.json`` file.
+        :param extensions_json: absolute path to an external
+            ``extensions.json`` file.
         """
 
         self.__ignored_routes = set(ignored_routes)
@@ -115,45 +117,47 @@ class Detector(object):
 
         pass  # void return
 
-    def detect(self, environ):
+    def __call__(self, request):
         """
-        Keyword argument(s):
+        Required argument(s):
 
-        :param environ: ``dict`` of HTTP request variables.
+        :param request: incoming HTTP request as a ``dict`` of variables.
 
-        Detects if the request came from a search engine robot and is eligible
-        for interception. The Detector will intercept in cascading order:
+        Detects if the incoming HTTP request came from a search engine robot
+        and is eligible for interception. The ``Detector`` inspects the
+        following aspects of the incoming HTTP request:
 
-          1. on an HTTP or HTTPS protocol
-          2. on an HTTP GET request
-          3. not on any ignored robot user agents (ignored robots take
-             precedence over matched robots)
-          4. not on any route not matching the whitelist
-          5. not on any route matching the blacklist
-          6. not on any invalid file extensions if there is a file extension
-          7. on requests with _escaped_fragment_ query parameter
-          8. on any matched robot user agents
+        1. if the request uses HTTP or HTTPS protocol
+        2. if the request uses HTTP ``GET`` method
+        3. if the request is *not* from any ignored user agenets
+            (ignored robots take precedence over matched robots)
+        4. if the request is accessing any route not matching the whitelist
+        5. if the request is not accessing any route matching the blacklist
+        6. if the request is *not* accessing any resource with an invalid file
+            extension
+        7. if the request has ``_escaped_fragment_`` query parameter
+        8. if the request is from any matched user agents
 
-        Returns :RFC:`3986` percent-encoded full url if eligible for
-        interception, ``None`` otherwise.
+        Returns an :RFC:`3986` percent-encoded full URL if the incoming request
+            is eligible for interception, or ``None`` otherwise.
         """
 
-        # wrap incoming request as a Request object
-        request = api.Request(environ)
+        # wrap the incoming HTTP request (CGI-style environ)
+        environ = api.AnyEnviron(request)
 
         # do not intercept protocols other than HTTP and HTTPS
-        if not request.scheme in ("http", "https", ):
+        if not environ.scheme in ("http", "https", ):
             return None
 
         # do not intercept HTTP methods other than GET
-        if not request.method in ("GET", ):
+        if not environ.method in ("GET", ):
             return None
 
         # user agent may not exist in the HTTP request
-        user_agent = request.user_agent
+        user_agent = environ.user_agent
 
         # request uri with query string
-        real_path = request.path_qs
+        real_path = environ.path_qs
 
         # validate ``robots`` since it can be altered from outside
         if not self._validate_robots():
@@ -245,14 +249,14 @@ class Detector(object):
 
         # detect escaped fragment (since the ignored user agents has already
         # been detected, SnapSearch won't continue the interception loop)
-        if "_escaped_fragment_" in request.GET:
-            return request.url
+        if "_escaped_fragment_" in environ.GET:
+            return environ.url
 
         # intercept requests from matched robots
         matched_regex = u("|").join(
             [re.escape(tok) for tok in self.robots.get('match', [])])
         if re.match(matched_regex, user_agent, re.I | re.U):
-            return request.url
+            return environ.url
 
         # do not intercept if no match at all
         return None

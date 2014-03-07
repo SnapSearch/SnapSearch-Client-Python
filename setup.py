@@ -33,13 +33,15 @@ def get_data_files():
     if files:
         data_files.append((join(datadir), files))
     #
-    files = glob(join("docs", "*.*"))
+    files = glob(join("docs", "*.rst"))
     if files:
         data_files.append((join(datadir, "docs"), files))
     #
-    files = glob(join("examples", "*", "*.*"))
-    if files:
-        data_files.append((join(datadir, "examples"), files))
+    for example in ("flask", "cgi", ):
+        files = glob(join("examples", example, "*.py")) + \
+            glob(join("examples", example, "*.rst"))
+        if files:
+            data_files.append((join(datadir, "examples", example), files))
     #
     files = glob(join("tests", "*.py"))
     if files:
@@ -75,8 +77,6 @@ setup(
     author_email=pkg.__contact__,
     description=pkg.__doc__,
     long_description=open("README.rst").read(),
-    keywords=["SnapSearch", "client", "SEO"],
-    url="https://github.com/liuyu81/SnapSearch-Client-Python",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -97,7 +97,9 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
+    keywords=["SnapSearch", "client", "SEO"],
     platforms="All",
     provides=["SnapSearch", ],
-    requires=["pycurl", ]
+    requires=["pycurl", ],
+    url="https://github.com/liuyu81/SnapSearch-Client-Python",
 )

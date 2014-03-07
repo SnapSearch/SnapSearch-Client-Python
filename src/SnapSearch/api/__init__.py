@@ -16,7 +16,7 @@ __all__ = ['SNAPSEARCH_API_URL',
            'DEFAULT_CA_BUNDLE_PEM',
            'DEFAULT_EXTENSIONS_JSON',
            'DEFAULT_ROBOTS_JSON',
-           'Request',
+           'AnyEnviron',
            'Response',
            'dispatch', ]
 
@@ -55,7 +55,7 @@ DEFAULT_ROBOTS_JSON = confirm_resource("robots.json")
 
 # snapsearch api objects and methods
 
-from .request import Request
+from .environ import AnyEnviron
 from .response import Response
 
 from .backend import dispatch

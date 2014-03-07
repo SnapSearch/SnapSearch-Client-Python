@@ -7,7 +7,7 @@
 # :date: 2014/03/06
 #
 
-__all__ = ['Request', ]
+__all__ = ['AnyEnviron', ]
 
 
 import os
@@ -20,49 +20,59 @@ from .._compat import (url_parse_qs,
                        url_unquote, )
 
 
-class Request(dict):
+class AnyEnviron(object):
     """
-    Extends a CGI / WSGI environ with SnapSearch-defined processing.
+    Wraps a CGI-style ``environ`` with WSGI-defined variables and properties in
+    SnapSearch-specified format and encoding.
     """
+
+    @property
+    def environ(self):
+        """
+        underlying CGI-style ``environ`` extended with WSGI-defined variables.
+        """
+        return self.__environ
 
     @property
     def GET(self):
         """
-        Returns parsed ``QUERY_STRING`` as a MultiDict.
+        parsed ``QUERY_STRING`` as a multi-``dict`` (i.e. each ``key``
+        associated with a ``list`` of values).
         """
         # :PEP:`3333`: ``QUERY_STRING`` MAY be empty or absent.
         if not self.__parsed_qs:
-            self.__parsed_qs = url_parse_qs(self.get('QUERY_STRING', ""), True)
+            self.__parsed_qs = url_parse_qs(
+                self.environ.get('QUERY_STRING', ""), True)
         return self.__parsed_qs
 
     @property
     def scheme(self):
         """
-        Returns ``wsgi.url_scheme``
+        ``wsgi.url_scheme``
         """
         # WSGI-defined variable ``wsgi.url_scheme`` MUST present.
-        return self['wsgi.url_scheme']
+        return self.environ['wsgi.url_scheme']
 
     @property
     def method(self):
         """
-        Returns ``REQUEST_METHOD`` or ``"N/A"``
+        ``REQUEST_METHOD`` or ``"N/A"``
         """
         # :PEP:`3333`: ``REQUEST_METHOD`` MUST present and be non-empty.
-        return self['REQUEST_METHOD']
+        return self.environ['REQUEST_METHOD']
 
     @property
     def user_agent(self):
         """
-        Returns ``HTTP_USER_AGENT`` or ``""``
+        ``HTTP_USER_AGENT`` or ``""``
         """
         # :PEP:`3333`: ``HTTP_USER_AGENT`` MAY be empty or absent.
-        return self.get('HTTP_USER_AGENT', "")
+        return self.environ.get('HTTP_USER_AGENT', "")
 
     @property
     def path_qs(self):
         """
-        Relative request URL without ``HTTP_HOST`` but with ``QUERY_STRING``,
+        relative request URL without ``HTTP_HOST`` but with ``QUERY_STRING``,
         decoded from both :RFC:`3986` percent-encoding (``'%20'``-> ``' '``)
         and Google's ``_escaped_fragment_``__ protocol.
 
@@ -74,7 +84,7 @@ class Request(dict):
     @property
     def url(self):
         """
-        Full request URL including ``HTTP_HOST`` and ``QUERY_STRING``, encoded
+        full request URL including ``HTTP_HOST`` and ``QUERY_STRING``, encoded
         to :RFC:`3986` percent-encoding (``' '``-> ``'%20'``), but decoded from
         Google's ``_escaped_fragment_``__ protocol.
 
@@ -84,23 +94,31 @@ class Request(dict):
         return self._get_encoded_url(True)
 
     # private properties
-    __slots__ = ['__parsed_qs', ]
+    __slots__ = ['__parsed_qs', '__environ', ]
 
-    def __init__(self, environ={}):
-        # make a (shallow) copy of the environ
-        super(Request, self).__init__(environ)
+    def __init__(self, environ):
+        """
+        Required argument(s):
+
+        :param environ: builtin Python ``dict`` of CGI-style environment
+            variables (see :PEP:`3333` Specification Details)
+        """
         # add missing CGI-defined variables (see :RFC:`3875).
-        self.setdefault('REQUEST_METHOD', "N/A")
+        environ.setdefault('REQUEST_METHOD', "N/A")
         # add missing WSGI-defined variables (see :PEP:`3333`).
-        self.setdefault('wsgi.version', (1, 0))
-        self.setdefault('wsgi.input', getattr(sys.stdin, 'buffer', sys.stdin))
-        self.setdefault('wsgi.errors', sys.stderr)
-        self.setdefault('wsgi.multithread', False)
-        self.setdefault('wsgi.multiprocess', True)
-        self.setdefault('wsgi.run_once', True)
-        self.setdefault('wsgi.url_scheme', wsgiref.util.guess_scheme(self))
+        environ.setdefault('wsgi.version', (1, 0))
+        environ.setdefault('wsgi.input',
+                           getattr(sys.stdin, 'buffer', sys.stdin))
+        environ.setdefault('wsgi.errors', sys.stderr)
+        environ.setdefault('wsgi.multithread', False)
+        environ.setdefault('wsgi.multiprocess', True)
+        environ.setdefault('wsgi.run_once', True)
+        environ.setdefault('wsgi.url_scheme',
+                           wsgiref.util.guess_scheme(environ))
         # parsed query string
         self.__parsed_qs = {}
+        # make a local reference to the raw ``environ``
+        self.__environ = environ
         pass  # void return
 
     def _get_encoded_url(self, include_qs=True):
@@ -108,14 +126,14 @@ class Request(dict):
         if include_qs and "_escaped_fragment_" in self.GET:
             return self._get_encoded_url(False) + "%(qs)s%(hash)s" % \
                 self._get_real_qs_and_hash_fragment(True)
-        return wsgiref.util.request_uri(self, include_qs)
+        return wsgiref.util.request_uri(self.environ, include_qs)
 
     def _get_decoded_path(self, include_qs=True):
         # un-percent-encoded request uri, relative to site root (/).
         if include_qs and "_escaped_fragment_" in self.GET:
             return self._get_decoded_path(False) + "%(qs)s%(hash)s" % \
                 self._get_real_qs_and_hash_fragment(False)
-        url = url_split(wsgiref.util.request_uri(self, True))
+        url = url_split(wsgiref.util.request_uri(self.environ, True))
         path = "?".join([url.path, url.query]) if include_qs else url.path
         return url_unquote(path)
 

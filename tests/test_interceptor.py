@@ -22,15 +22,23 @@ except (ValueError, ImportError):
     from _config import unittest
 
 
+@unittest.skipIf(not os.environ.get('SNAPSEARCH_API_CREDENTIALS', None) and
+                 os.environ.get('TRAVIS', False),
+                 "API credentials are required for unsupervised testing")
 class TestInterceptorMethods(unittest.TestCase):
+    """
+    Tests ``Interceptor.__init__()`` and ``Interceptor.__call__()``.
+    """
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         pass  # void return
 
     def test_interceptor_init(self):
+
         pass  # void return
 
-    def test_interceptor_intercept(self):
+    def test_interceptor_call(self):
         pass  # void return
 
     def test_interceptor_callback(self):

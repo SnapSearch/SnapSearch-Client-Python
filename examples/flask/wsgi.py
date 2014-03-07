@@ -21,7 +21,7 @@ class Middleware(object):
         def start_interception(status, response_headers, exc_info=None):
 
             print("middleware:", "start interception")
-            response = self.interceptor.intercept(environ)
+            response = self.interceptor(environ)
 
             # <TODO>
             if not response:

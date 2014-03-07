@@ -9,7 +9,7 @@
 #
 
 __all__ = ['TestClientInit',
-           'TestClientRequest', ]
+           'TestClientMethods', ]
 
 
 import os
@@ -28,28 +28,29 @@ class TestClientInit(unittest.TestCase):
     Tests different ways to initialize a Client object.
     """
 
-    def setUp(self):
-        self.api_email = "fantasy@email.com"
-        self.api_key = "fantasy_Api_Key"
-        self.HTTPS_API = "https://snapsearch.io/api/v1/robot"
-        self.NON_HTTPS_API = "http://snapsearch.io/api/v1/robot"
-        self.EXTERNAL_CA_BUNDLE_PEM = _config.save_temp(
+    @classmethod
+    def setUpClass(cls):
+        cls.api_email = "fantasy@email.com"
+        cls.api_key = "fantasy_Api_Key"
+        cls.HTTPS_API = "https://snapsearch.io/api/v1/robot"
+        cls.NON_HTTPS_API = "http://snapsearch.io/api/v1/robot"
+        cls.EXTERNAL_CA_BUNDLE_PEM = _config.save_temp(
             "cacert.pem", _config.DATA_CA_BUNDLE_PEM.encode("utf-8"))
-        self.NON_EXISTENT_PEM = _config.save_temp(
+        cls.NON_EXISTENT_PEM = _config.save_temp(
             "no_such_file", b"") + ".pem"
         pass  # void return
 
     def test_client_init(self):
         # initialize with default arguments
         from SnapSearch import Client
-        c = Client(self.api_email, self.api_key, {"test": 1})
+        client = Client(self.api_email, self.api_key, {"test": 1})
         pass  # void return
 
     def test_client_init_external_api_url(self):
         # initialize with default arguments
         from SnapSearch import Client, SnapSearchError
         # https api url
-        c = Client(
+        client = Client(
             self.api_email, self.api_key, {"test": 1}, api_url=self.HTTPS_API)
         # non-https api url
         self.assertRaises(
@@ -60,7 +61,7 @@ class TestClientInit(unittest.TestCase):
     def test_client_init_external_ca_path(self):
         from SnapSearch import Client, SnapSearchError
         # existing pem file
-        c = Client(
+        client = Client(
             self.api_email, self.api_key, ca_path=self.EXTERNAL_CA_BUNDLE_PEM)
         # non-existent pem file
         self.assertRaises(
@@ -74,49 +75,52 @@ class TestClientInit(unittest.TestCase):
 @unittest.skipIf(not os.environ.get('SNAPSEARCH_API_CREDENTIALS', None) and
                  os.environ.get('TRAVIS', False),
                  "API credentials are required for unsupervised testing")
-class TestClientRequest(unittest.TestCase):
+class TestClientMethods(unittest.TestCase):
     """
-    Test Client.request() with different URL's.
+    Test ``Client.__call__()`` with different URL's.
     """
 
-    def setUp(self):
-        self.BAD_API_URL = "https://non.existent/site"
-        self.NORMAL_SITE_URL = "https://snapsearch.io/"
-        self.INVALID_SITE_URL = "email:liuyu@opencps.net"
-        self.NON_EXISTENT_SITE_URL = "https://www.google.com/non-existent"
+    @classmethod
+    def setUpClass(cls):
+        cls.BAD_API_URL = "https://non.existent/site"
+        cls.NORMAL_SITE_URL = "https://snapsearch.io/"
+        cls.INVALID_SITE_URL = "email:liuyu@opencps.net"
+        cls.NON_EXISTENT_SITE_URL = "https://www.google.com/non-existent"
         # API credentials
         credentials = os.environ.get('SNAPSEARCH_API_CREDENTIALS', None) or \
             raw_input("API credentials: ")
-        self.api_email, sep, self.api_key = credentials.partition(":")
+        cls.api_email, sep, cls.api_key = credentials.partition(":")
         pass  # void return
 
-    def test_client_request_bad_api_url(self):
+    def test_client_call_bad_api_url(self):
         from SnapSearch import Client, SnapSearchConnectionError
-        c = Client(
+        client = Client(
             self.api_email, self.api_key, {"test": 1},
             api_url=self.BAD_API_URL)
-        self.assertRaises(SnapSearchConnectionError, c.request,
+        self.assertRaises(SnapSearchConnectionError, client,
                           self.NORMAL_SITE_URL)
         pass  # void return
 
-    def test_client_request_normal_site_url(self):
+    def test_client_call_normal_site_url(self):
         from SnapSearch import Client
-        c = Client(self.api_email, self.api_key, {"test": 1})
-        r = c.request(self.NORMAL_SITE_URL)
-        self.assertEqual(r.get('status', None), 200)
+        client = Client(self.api_email, self.api_key, {"test": 1})
+        response = client(self.NORMAL_SITE_URL)
+        self.assertTrue(isinstance(response, dict))
+        self.assertEqual(response.get('status', None), 200)
         pass  # void return
 
-    def test_client_request_missing_site_url(self):
+    def test_client_call_missing_site_url(self):
         from SnapSearch import Client
-        c = Client(self.api_email, self.api_key, {"test": 1})
-        r = c.request(self.NON_EXISTENT_SITE_URL)
-        self.assertEqual(r.get('status', None), 404)
+        client = Client(self.api_email, self.api_key, {"test": 1})
+        response = client(self.NON_EXISTENT_SITE_URL)
+        self.assertTrue(isinstance(response, dict))
+        self.assertEqual(response.get('status', None), 404)
         pass  # void return
 
-    def test_client_request_validation_error(self):
+    def test_client_call_validation_error(self):
         from SnapSearch import Client, SnapSearchError
-        c = Client(self.api_email, self.api_key, {"test": 1})
-        self.assertRaises(SnapSearchError, c.request, self.INVALID_SITE_URL)
+        client = Client(self.api_email, self.api_key, {"test": 1})
+        self.assertRaises(SnapSearchError, client, self.INVALID_SITE_URL)
         pass  # void return
 
     pass
