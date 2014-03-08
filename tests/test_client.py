@@ -6,8 +6,8 @@
 
     Tests SnapSearch.client
 
-    :copyright: (c) 2014 by SnapSearch.
-    :license: MIT, see LICENSE for more details.
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = ['TestClientInit',
@@ -50,25 +50,25 @@ class TestClientInit(unittest.TestCase):
 
     def test_client_init_external_api_url(self):
         # initialize with default arguments
-        from SnapSearch import Client, SnapSearchError
+        from SnapSearch import Client, error
         # https api url
         client = Client(
             self.api_email, self.api_key, {'test': 1}, api_url=self.HTTPS_API)
         # non-https api url
         self.assertRaises(
-            SnapSearchError, Client, self.api_email, self.api_key, {'test': 1},
-            api_url=self.NON_HTTPS_API)
+            error.SnapSearchError, Client, self.api_email, self.api_key,
+            {'test': 1}, api_url=self.NON_HTTPS_API)
         pass  # void return
 
     def test_client_init_external_ca_path(self):
-        from SnapSearch import Client, SnapSearchError
+        from SnapSearch import Client, error
         # existing pem file
         client = Client(
             self.api_email, self.api_key, ca_path=self.EXTERNAL_CA_BUNDLE_PEM)
         # non-existent pem file
         self.assertRaises(
-            SnapSearchError, Client, self.api_email, self.api_key, {'test': 1},
-            ca_path=self.NON_EXISTENT_PEM)
+            error.SnapSearchError, Client, self.api_email, self.api_key,
+            {'test': 1}, ca_path=self.NON_EXISTENT_PEM)
         pass  # void return
 
     pass
@@ -92,11 +92,11 @@ class TestClientMethods(unittest.TestCase):
         pass  # void return
 
     def test_client_call_bad_api_url(self):
-        from SnapSearch import Client, SnapSearchConnectionError
+        from SnapSearch import Client, error
         client = Client(
             self.api_email, self.api_key, {'test': 1},
             api_url=self.BAD_API_URL)
-        self.assertRaises(SnapSearchConnectionError, client,
+        self.assertRaises(error.SnapSearchConnectionError, client,
                           self.NORMAL_SITE_URL)
         pass  # void return
 
@@ -117,9 +117,44 @@ class TestClientMethods(unittest.TestCase):
         pass  # void return
 
     def test_client_call_validation_error(self):
-        from SnapSearch import Client, SnapSearchError
+        from SnapSearch import Client, error
         client = Client(self.api_email, self.api_key, {'test': 1})
-        self.assertRaises(SnapSearchError, client, self.INVALID_SITE_URL)
+        self.assertRaises(error.SnapSearchError, client, self.INVALID_SITE_URL)
+        pass  # void return
+
+    def test_client_call_bad_response(self):
+        # uses a dummy dispatch function to emulate a broken backend service
+        # returning None as response, causing client.__call__() to raise error.
+        from SnapSearch import Client, error
+        client = Client(self.api_email, self.api_key, {'test': 1})
+
+        def dummy_dispatch(**kwds):
+            return None
+
+        from SnapSearch import api
+        old_dispatch = api.dispatch
+        api.dispatch = dummy_dispatch
+        self.assertRaises(error.SnapSearchError, client, self.NORMAL_SITE_URL)
+        api.dispatch = old_dispatch
+        pass  # void return
+
+    def test_client_call_unknown_response(self):
+        # uses a dummy dispatch function to emulate a broken backend service
+        # returning unknown response code, causing client.__call__() to fail.
+        from SnapSearch import Client
+        from SnapSearch.api.response import Response
+        client = Client(self.api_email, self.api_key, {'test': 1})
+
+        def dummy_dispatch(**kwds):
+            return Response(status=200, headers=[(), ()],
+                            body={'code': "unknown", 'content': "unknown"})
+
+        from SnapSearch import api
+        old_dispatch = api.dispatch
+        api.dispatch = dummy_dispatch
+        response = client(self.NORMAL_SITE_URL)
+        self.assertEqual(response, None)
+        api.dispatch = old_dispatch
         pass  # void return
 
     pass

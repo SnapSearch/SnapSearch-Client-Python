@@ -3,8 +3,8 @@
     SnapSearch.tests._config
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 by SnapSearch.
-    :license: MIT, see LICENSE for more details.
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = []
@@ -33,6 +33,12 @@ try:
 except ImportError:
     # python 2.7+
     import unittest
+
+
+# unittest verbosity
+
+VERBOSE = ("-v" in sys.argv or "--verbose" in sys.argv)
+
 
 # utilities for managing package data
 
@@ -103,8 +109,6 @@ DATA_ADSBOT_GOOG_POST = load_data("req_adsbot_goog_post.json").decode("utf-8")
 DATA_GOOGBOT_IGNORED = load_data("req_googbot_ignored.json").decode("utf-8")
 DATA_MSNBOT_MATCHED = load_data("req_msnbot_matched.json").decode("utf-8")
 
-VERBOSE = ("-v" in sys.argv or "--verbose" in sys.argv)
-
 
 # pre-configured data
 
@@ -126,17 +130,20 @@ class TestPackageIntegrity(unittest.TestCase):
 
     def test_dependency(self):
         from SnapSearch.api import backend
+
         if VERBOSE:
-            sys.stderr.write("\n    HTTP library using: ``%s (%s)`` ... " %
+            sys.stderr.write("\n    HTTP library: ``%s (%s)`` ... " %
                              backend.httpinfo[:2])
+
         self.assertTrue(backend.httpinfo[0])
         pass
 
     def test_environ(self):
         self.assertTrue(os.path.isdir(DATA_DIR))
         self.assertTrue(os.path.isdir(TEMP_DIR))
+
         if VERBOSE:
-            sys.stderr.write("\n    Python: ``%s`` (%s/%s) ..." %
+            sys.stderr.write("\n    Python: ``%s (%s/%s)`` ..." %
                              (platform.python_version(),
                               platform.system(),
                               platform.machine()))
@@ -144,31 +151,42 @@ class TestPackageIntegrity(unittest.TestCase):
 
     def test_package(self):
         import SnapSearch
+
         if VERBOSE:
             sys.stderr.write("\n    SnapSearch: ``%d.%d.%d`` ... " %
                              SnapSearch.__version__)
+
         self.assertTrue(isinstance(SnapSearch.Client, object))
         self.assertTrue(isinstance(SnapSearch.Detector, object))
         self.assertTrue(isinstance(SnapSearch.Interceptor, object))
-        self.assertTrue(isinstance(SnapSearch.SnapSearchError, object))
-        pass
+
+        from SnapSearch import error
+        self.assertTrue(isinstance(error.SnapSearchError, object))
+        self.assertTrue(isinstance(error.SnapSearchConnectionError, object))
+        self.assertTrue(isinstance(error.SnapSearchDependencyError, object))
+
+        from SnapSearch import wsgi
+        self.assertTrue(isinstance(wsgi.InterceptorMiddleware, object))
+
+        pass  # void return
 
     def test_types_error_base(self):
-        from SnapSearch import SnapSearchError
-        e = SnapSearchError("base error", code=100)
+        from SnapSearch import error
+        e = error.SnapSearchError("base error", code=100)
         self.assertEqual(e.code, 100)
         self.assertRaises(AttributeError, lambda: e.no_such_attr)
         pass  # void return
 
     def test_types_error_connection(self):
-        from SnapSearch import SnapSearchConnectionError
-        ce = SnapSearchConnectionError("connection error", status=404)
+        from SnapSearch import error
+        ce = error.SnapSearchConnectionError("connection error", status=404)
         self.assertEqual(ce.status, 404)
         pass  # void return
 
     def test_types_error_dependency(self):
-        from SnapSearch import SnapSearchDependencyError
-        de = SnapSearchDependencyError("import error", requires=["pycurl", ])
+        from SnapSearch import error
+        de = error.SnapSearchDependencyError("import error",
+                                             requires=["pycurl", ])
         self.assertEqual(de.requires[0], "pycurl")
         pass  # void return
 

@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-    Backend Service Abstraction Layer for SnapSearch
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SnapSearch.api
+    ~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 by SnapSearch.
+    Backend Service Abstraction Layer for `SnapSearch`_.
+
+    .. _`SnapSearch`: https://snapsearch.io/
+
+    :copyright: 2014 by `SnapSearch`_
     :license: MIT, see LICENSE for more details.
+
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = ['SNAPSEARCH_API_URL',
+           'SNAPSEARCH_API_HTTP_LIBRARY',
            'SNAPSEARCH_API_ACCEPT_ENCODING',
            'SNAPSEARCH_API_FOLLOW_REDIRECT',
            'SNAPSEARCH_API_TIMEOUT',
@@ -23,7 +31,7 @@ import os
 import os.path
 import sys
 
-# snapsearch api parameters
+# snapsearch api parameters (can be changed by users)
 
 SNAPSEARCH_API_URL = "https://snapsearch.io/api/v1/robot"
 SNAPSEARCH_API_FOLLOW_REDIRECT = False
@@ -37,7 +45,8 @@ RESOURCE_DIR = os.path.dirname(__file__)
 
 def confirm_resource(name):
     """
-    Returns confirmed full path to the specified resource file name.
+    :param name: name of the bundled resource file.
+    :returns: confirmed full path to the specified resource file.
     """
     path = os.path.abspath(os.path.join(RESOURCE_DIR, name))
     return path if os.access(path, os.F_OK | os.R_OK) else None
@@ -59,6 +68,8 @@ from .backend import dispatch, httpinfo as __httpinfo
 from .environ import AnyEnv
 from .response import Response
 
-# snapsearch api constants
 
+# snapsearch api constants (should NEVER be changed by users)
+
+SNAPSEARCH_API_HTTP_LIBRARY = __httpinfo[0]
 SNAPSEARCH_API_ACCEPT_ENCODING = ", ".join(__httpinfo[2])

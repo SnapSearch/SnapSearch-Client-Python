@@ -3,11 +3,15 @@
     SnapSearch.client
     ~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 by SnapSearch.
+    :copyright: 2014 by `SnapSearch <https://snapsearch.io/>`_
     :license: MIT, see LICENSE for more details.
+
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = ['Client', ]
+
 
 import json
 import os
@@ -19,8 +23,8 @@ import SnapSearch.error as error
 
 class Client(object):
     """
-    ``Client`` dispatches the SnapSearch backend service and retrieves a
-    snapshot of the URL being accessed by the incoming HTTP request.
+    Dispatches a URL to SnapSearch backend service, and receives a response
+    containing search engine optimized representation of the URL's target.
     """
 
     # private properties
@@ -30,12 +34,10 @@ class Client(object):
     def __init__(self, api_email, api_key, request_parameters={},
                  api_url=None, ca_path=None):
         """
-        Required arguments:
-
         :param api_email: registered email as username for authentication
-        against the SnapSearch backend service.
+            against the SnapSearch backend service.
         :param api_key: api key as password for authentication against the
-        SnapSearch backend service.
+            SnapSearch backend service.
 
         Optional arguments:
 
@@ -43,6 +45,11 @@ class Client(object):
             and sent to SnapSearch backend service.
         :param api_url: URL to SnapSearch backend service.
         :param ca_path: absolute path to an external CA bundle file.
+
+        :raises error.SnapSearchError: if ``api_url`` uses a non-https scheme
+            (i.e. not starting with ``"https://"``).
+        :raises error.SnapSearchError: if ``ca_path`` is either invalid or
+            inaccessible.
         """
 
         self.__api_email = api_email
@@ -61,13 +68,19 @@ class Client(object):
 
     def __call__(self, current_url):
         """
-        Required argument(s):
+        :param current_url: URL that the search engine robot is currently
+            trying to access.
 
-        :param current_url: current URL that the search engine robot is
-            attempting to access.
+        :returns: the response from SnapSearch backend service, or ``None``
+            if the ``code`` field of the response ``body`` is neither
+            ``"success"`` nor ``"validation_error"``.
 
-        Returns the response from SnapSearch backend service. Raises
-        ``SnapSearchError`` on failure.
+        :raises error.SnapSearchError: if either the ``status`` or ``headers``
+            property of the response is empty.
+        :raises error.SnapSearchError: if the response ``body`` is malformed
+            (i.e. not containing fields ``"code"`` and ``"content"``).
+        :raises error.SnapSearchError: if the ``code`` field of the response
+            ``body`` equals ``"validation_error"``.
         """
         self.__request_parameters['url'] = current_url
         payload = json.dumps(self.__request_parameters)

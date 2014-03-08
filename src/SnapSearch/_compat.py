@@ -3,8 +3,11 @@
     SnapSearch._compat
     ~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 by SnapSearch.
+    :copyright: 2014 by `SnapSearch <https://snapsearch.io/>`_
     :license: MIT, see LICENSE for more details.
+
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = ['DEBUG', 'PY2', ]
@@ -26,12 +29,14 @@ PY2 = (sys.version_info[0] == 2)
 
 try:
     # python 3.x
+    from http.client import responses as HTTP_STATUS_CODES
     from urllib.parse import parse_qs as url_parse_qs
     from urllib.parse import quote as url_quote
     from urllib.parse import urlsplit as url_split
     from urllib.parse import unquote as url_unquote
 except ImportError:
     # python 2.x
+    from httplib import responses as HTTP_STATUS_CODES
     from urlparse import parse_qs as url_parse_qs
     from urllib import quote as url_quote
     from urlparse import urlsplit as url_split

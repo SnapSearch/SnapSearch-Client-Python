@@ -5,9 +5,56 @@
 
     wrapper for response from SnapSearch backend service
 
-    :copyright: (c) 2014 by SnapSearch.
+    :copyright: 2014 by `SnapSearch <https://snapsearch.io/>`_
     :license: MIT, see LICENSE for more details.
+
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
+
+__all__ = ['Response', ]
+
+
+from .._compat import u, HTTP_STATUS_CODES
+
+
+def _extract_message(response_body):
+
+    # http status code
+    code = response_body.get('status', 200)
+    status = ("%d %s" % (code, HTTP_STATUS_CODES[code])).encode("utf-8")
+
+    # response body
+    payload = response_body.get('html', u("")).encode("utf-8")
+
+    # response headers
+    headers = []
+    for item in response_body.get('headers', []):
+
+        # bad entries
+        if not isinstance(item, dict):
+            continue
+        if not "name" in item:
+            continue
+        if not "value" in item:
+            continue
+
+        # candidate entry
+        tup = (str(item['name']).lower().encode("utf-8"),
+               str(item['value']).encode("utf-8"))
+
+        # dirty entry (needs to be fixed later)
+        if tup[0] in (b"content-type", b"content-length"):
+            continue
+
+        # selected entry
+        headers.append(tup)
+
+    # fixed header entries
+    headers.append((b"content-type", b"text/html"))
+    headers.append((b"content-length", bytes(len(payload))))
+
+    return {'status': status, 'headers': headers, 'html': payload}
 
 
 class Response(object):
@@ -30,7 +77,7 @@ class Response(object):
         HTTP headers (``dict``)
         """
         if not self.__headers:
-            self.__headers = self.__raw_response.get('headers', None)
+            self.__headers = self.__raw_response.get('headers', {})
         return self.__headers
 
     @property
@@ -39,7 +86,7 @@ class Response(object):
         response body (``dict``)
         """
         if not self.__body:
-            self.__body = self.__raw_response.get('body', "")
+            self.__body = self.__raw_response.get('body', {})
         return self.__body
 
     # private properties

@@ -5,8 +5,11 @@
 
     wrapper for CGI-style ``environ`` (``dict`` of HTTP request variables)
 
-    :copyright: (c) 2014 by SnapSearch.
+    :copyright: 2014 by `SnapSearch <https://snapsearch.io/>`_
     :license: MIT, see LICENSE for more details.
+
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = ['AnyEnv', ]
@@ -51,7 +54,7 @@ class AnyEnv(object):
     @property
     def scheme(self):
         """
-        ``wsgi.url_scheme``
+        getter of ``environ['wsgi.url_scheme']``.
         """
         # WSGI-defined variable ``wsgi.url_scheme`` MUST present.
         return self.environ['wsgi.url_scheme']
@@ -59,7 +62,7 @@ class AnyEnv(object):
     @property
     def method(self):
         """
-        ``REQUEST_METHOD`` or ``"N/A"``
+        getter of ``environ['REQUEST_METHOD']``, or ``"N/A"`` if absent.
         """
         # :PEP:`3333`: ``REQUEST_METHOD`` MUST present and be non-empty.
         return self.environ['REQUEST_METHOD']
@@ -67,7 +70,7 @@ class AnyEnv(object):
     @property
     def user_agent(self):
         """
-        ``HTTP_USER_AGENT`` or ``""``
+        getter of ``environ['HTTP_USER_AGENT']``, or ``""`` if absent.
         """
         # :PEP:`3333`: ``HTTP_USER_AGENT`` MAY be empty or absent.
         return self.environ.get('HTTP_USER_AGENT', "")
@@ -75,36 +78,39 @@ class AnyEnv(object):
     @property
     def path_qs(self):
         """
-        relative request URL without ``HTTP_HOST`` but with ``QUERY_STRING``,
-        decoded from both :RFC:`3986` percent-encoding (``'%20'``-> ``' '``)
-        and Google's ``_escaped_fragment_``__ protocol.
+        relative request URL (without ``HTTP_HOST`` but with ``QUERY_STRING``),
+        decoded from :RFC:`3986` percent-encoding (i.e. ``'%20'``-> ``' '``)
+        and Google's ``_escaped_fragment_``  `protocol`_.
 
-        .. __: http://developers.google.com/webmasters/ajax-crawling/docs
-               /specification
+        .. _`protocol`: http://developers.google.com/webmasters/ajax-crawling/
+            docs/specification
         """
         return self._get_decoded_path(True)
 
     @property
     def url(self):
         """
-        full request URL including ``HTTP_HOST`` and ``QUERY_STRING``, encoded
-        to :RFC:`3986` percent-encoding (``' '``-> ``'%20'``), but decoded from
-        Google's ``_escaped_fragment_``__ protocol.
+        full request URL (including ``HTTP_HOST`` and ``QUERY_STRING``),
+        encoded to :RFC:`3986` percent-encoding (i.e. ``' '``-> ``'%20'``), but
+        decoded from Google's ``_escaped_fragment_`` `protocol`_.
 
-        .. __: http://developers.google.com/webmasters/ajax-crawling/docs
-               /specification
+        .. _`protocol`: http://developers.google.com/webmasters/ajax-crawling/
+            docs/specification
         """
-        return self._get_encoded_url(True)
+        # (WSGI) applications are allowed to add new entries to the ``environ``
+        # per the WSGI 1.0.1 spec (see :PEP:`3333` Specification Details).
+        if not "SnapSearch.encoded_url" in self.environ:
+            self.environ['SnapSearch.encoded_url'] = \
+                self._get_encoded_url(True)
+        return self.environ['SnapSearch.encoded_url']
 
     # private properties
     __slots__ = ['__parsed_qs', '__environ', ]
 
     def __init__(self, environ):
         """
-        Required argument(s):
-
-        :param environ: builtin Python ``dict`` of CGI-style environment
-            variables (see :PEP:`3333` Specification Details)
+        :param environ: CGI-style environment variables
+        :type environ: builtin Python ``dict`` (see :PEP:`3333`)
         """
         # add missing CGI-defined variables (see :RFC:`3875).
         environ.setdefault('REQUEST_METHOD', "N/A")

@@ -1,11 +1,8 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    SnapSearch Client Demo (Flask)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Intercepting a Flask_ application with WSGI middleware
-
-    .. _Flask: http://flask.pocoo.org/
+    SnapSearch Client Demo (CGI)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: 2014 by `SnapSearch <https://snapsearch.io/>`_
     :license: MIT, see LICENSE for more details.
@@ -14,14 +11,19 @@
     :date: 2014/03/08
 """
 
-from flask import Flask
+import cgi
+import cgitb
+import sys
 
-app = Flask(__name__)
 
-
-@app.route('/')
 def hello_world():
-    return "Hello World!\r\n"
+    msg = b"Hello World!"
+    sys.stdout.write(b"Status: 200 OK\r\n")
+    sys.stdout.write(b"Content-Type: text/html; charset=utf-8\r\n")
+    sys.stdout.write(b"Content-Length: %d\r\n" % len(msg))
+    sys.stdout.write(b"\r\n")
+    sys.stdout.write(b"%s\r\n" % msg)
+    return 0
 
 
 if __name__ == '__main__':
@@ -36,8 +38,8 @@ if __name__ == '__main__':
     interceptor = Interceptor(Client(api_email, api_key), Detector())
 
     # deploy the interceptor
-    from SnapSearch.wsgi import InterceptorMiddleware
-    app.wsgi_app = InterceptorMiddleware(app.wsgi_app, interceptor)
+    from SnapSearch.cgi import InterceptorController
+    InterceptorController(interceptor).start()
 
     # start servicing
-    app.run(host="0.0.0.0", port=5000)
+    sys.exit(hello_world())

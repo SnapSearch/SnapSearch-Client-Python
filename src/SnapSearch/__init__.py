@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-    SnapSearch-Client-Python
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+    SnapSearch
+    ~~~~~~~~~~
 
-    Pythonic HTTP Client and Middleware for `SnapSearch`_.
+    Pythonic HTTP Client and Middleware Library for `SnapSearch`_.
 
     .. _`SnapSearch`: https://snapsearch.io/
 
-    :copyright: (c) 2014 by SnapSearch.
+    :copyright: 2014 by `SnapSearch`_
     :license: MIT, see LICENSE for more details.
+
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = ['Client',
            'Detector',
-           'Interceptor',
-           'SnapSearchError',
-           'SnapSearchConnectionError',
-           'SnapSearchDependencyError', ]
+           'Interceptor', ]
 
 
 # package metadata
@@ -33,4 +33,3 @@ __version__ = (0, 0, 6)
 from .client import Client
 from .detector import Detector
 from .interceptor import Interceptor
-from .error import *

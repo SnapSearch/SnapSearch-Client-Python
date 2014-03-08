@@ -5,7 +5,7 @@ SnapSearch-Client-Python
 .. image:: http://badge.fury.io/py/SnapSearch-Client-Python.png
    :target: http://badge.fury.io/py/SnapSearch-Client-Python
 
-.. image:: https://pypip.in/d/SnapSearch-Client-Python/badge.png?period=month
+.. image:: https://pypip.in/d/SnapSearch-Client-Python/badge.png
    :target: https://crate.io/packages/SnapSearch-Client-Python/
    :alt: Downloads
 

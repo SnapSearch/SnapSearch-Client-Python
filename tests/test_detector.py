@@ -6,8 +6,8 @@
 
     Tests SnapSearch.detector
 
-    :copyright: (c) 2014 by SnapSearch.
-    :license: MIT, see LICENSE for more details.
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 # future import should come first
@@ -231,7 +231,7 @@ class TestDetectorProperties(unittest.TestCase):
         pass  # void return
 
     def test_detector_prop_update_robots(self):
-        from SnapSearch import Detector, SnapSearchError
+        from SnapSearch import Detector, error
         detector = Detector()
         request = self.ADSBOT_GOOG_GET
         # append a robot to the white list
@@ -240,11 +240,11 @@ class TestDetectorProperties(unittest.TestCase):
         self.assertFalse(detector(request))
         # try to damange the structure of ``robots``
         detector.robots['ignore'] = None
-        self.assertRaises(SnapSearchError, detector, request)
+        self.assertRaises(error.SnapSearchError, detector, request)
         pass  # void return
 
     def test_detector_prop_update_extension(self):
-        from SnapSearch import Detector, SnapSearchError
+        from SnapSearch import Detector, error
         detector = Detector(check_file_extensions=True)
         request = self.ADSBOT_GOOG_MP3
         self.assertFalse(detector(request))
@@ -252,7 +252,7 @@ class TestDetectorProperties(unittest.TestCase):
         self.assertTrue(detector(request))
         # try to damange the structure of ``extensions``
         detector.extensions['generic'] = None
-        self.assertRaises(SnapSearchError, detector, request)
+        self.assertRaises(error.SnapSearchError, detector, request)
         pass  # void return
 
     pass

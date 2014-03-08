@@ -3,8 +3,8 @@
     SnapSearch.tests.__main__
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 by SnapSearch.
-    :license: MIT, see LICENSE for more details.
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = []

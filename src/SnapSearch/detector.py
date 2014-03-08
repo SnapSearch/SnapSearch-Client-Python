@@ -3,9 +3,13 @@
     SnapSearch.detector
     ~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 by SnapSearch.
+    :copyright: 2014 by `SnapSearch <https://snapsearch.io/>`_
     :license: MIT, see LICENSE for more details.
+
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
+
 
 # future import should come first
 from __future__ import with_statement
@@ -26,8 +30,20 @@ from ._compat import u
 
 class Detector(object):
     """
-    ``Detector`` detects if an HTTP request is a) from a search engine robot,
-    and b) the targeted resource is eligible for interception.
+    Detects if the incoming HTTP request a) came from a search engine robot
+    and b) is eligible for interception. The ``Detector`` inspects the
+    following aspects of the incoming HTTP request:
+
+      1. if the request uses HTTP or HTTPS protocol
+      2. if the request uses HTTP ``GET`` method
+      3. if the request is *not* from any ignored user agenets
+         (ignored robots take precedence over matched robots)
+      4. if the request is accessing any route *not* matching the whitelist
+      5. if the request is *not* accessing any route matching the blacklist
+      6. if the request is *not* accessing any resource with an invalid
+         file extension
+      7. if the request has ``_escaped_fragment_`` query parameter
+      8. if the request is from any matched user agents
     """
 
     @property
@@ -84,15 +100,19 @@ class Detector(object):
         """
         Optional arguments:
 
-        :param ignored_routes: ``list`` or ``tuple`` of blacklisted route
-            regular expressions.
-        :param matched_routes: ``list`` or ``tuple`` of whitelisted route
-            regular expressions.
-        :param check_file_extensions: ``bool`` to check if the URL is going
-            to a static file resource that should not be intercepted.
+        :param ignored_routes: blacklisted route regular expressions.
+        :type ignored_routes: ``list`` or ``tuple``
+        :param matched_routes: whitelisted route regular expressions.
+        :type matched_routes: ``list`` or ``tuple``
+        :param check_file_extensions: to check if the URL is going to a static
+            file resource that should not be intercepted.
+        :type check_file_extensions: ``bool``
         :param robots_json: absolute path to an external ``robots.json`` file.
         :param extensions_json: absolute path to an external
             ``extensions.json`` file.
+
+        :raises AssertionError: if ``extensions.json`` is specified, yet
+            ``check_file_extensions`` is ``False``.
         """
 
         self.__ignored_routes = set(ignored_routes)
@@ -102,7 +122,7 @@ class Detector(object):
         # extensions. this probably means a mistake.
         assert(not (not check_file_extensions and extensions_json)), \
             "specified ``extensions_json`` " \
-            "while ``check_file_extensions`` is false"
+            "yet ``check_file_extensions`` is false"
         self.__check_file_extensions = check_file_extensions
 
         # json.load() may raise IOError, TypeError, or ValueError
@@ -119,27 +139,14 @@ class Detector(object):
 
     def __call__(self, request):
         """
-        Required argument(s):
+        :param request: incoming HTTP request.
+        :type request: ``dict``
 
-        :param request: incoming HTTP request as a ``dict`` of variables.
+        :returns: :RFC:`3986` percent-encoded full URL if the incoming HTTP
+            request is eligible for interception, or ``None`` otherwise.
 
-        Detects if the incoming HTTP request came from a search engine robot
-        and is eligible for interception. The ``Detector`` inspects the
-        following aspects of the incoming HTTP request:
-
-        1. if the request uses HTTP or HTTPS protocol
-        2. if the request uses HTTP ``GET`` method
-        3. if the request is *not* from any ignored user agenets
-            (ignored robots take precedence over matched robots)
-        4. if the request is accessing any route not matching the whitelist
-        5. if the request is not accessing any route matching the blacklist
-        6. if the request is *not* accessing any resource with an invalid file
-            extension
-        7. if the request has ``_escaped_fragment_`` query parameter
-        8. if the request is from any matched user agents
-
-        Returns an :RFC:`3986` percent-encoded full URL if the incoming request
-            is eligible for interception, or ``None`` otherwise.
+        :raises error.SnapSearchError: if the structure of either
+            ``robots.json`` or ``extensions.json`` is invalid.
         """
 
         # wrap the incoming HTTP request (CGI-style environ)

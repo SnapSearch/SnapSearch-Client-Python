@@ -3,23 +3,26 @@
     SnapSearch.interceptor
     ~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2014 by SnapSearch.
+    :copyright: 2014 by `SnapSearch <https://snapsearch.io/>`_
     :license: MIT, see LICENSE for more details.
+
+    :author: `LIU Yu <liuyu@opencps.net>`_
+    :date: 2014/03/08
 """
 
 __all__ = ['Interceptor', ]
 
 
-from . import Client, Detector
+from .client import Client
+from .detector import Detector
 
 
 class Interceptor(object):
     """
-    ``Interceptor`` intercepts the incoming HTTP request and depends on an
-    associated ``Detector`` object to detect for search engine robots. If the
-    request is valid for interception, the other associated ``Client`` object
-    will dispatch the request to SnapSearch backend service for scraping and
-    finally returning the content of a snapshot.
+    Intercepts the incoming HTTP request using an associated ``Detector``
+    object to detect for search engine robots. If the request is elegible for
+    interception, the other associated ``Client`` object will dispatch the
+    requested URL to SnapSearch backend service for scraping.
     """
 
     @property
@@ -56,17 +59,21 @@ class Interceptor(object):
     def __init__(self, client, detector, before_intercept=None,
                  after_intercept=None):
         """
-        Required arguments:
-
         :param client: initialized ``Client`` object to associate
         :param detector: initialized ``Detector`` object to associate
 
         Optional arguments:
 
-        :param before_intercept: pre-interception callback object with
-            signature ``__call__(url) -> result``
-        :param after_intercept: post-interception callable object with
-            signature ``__call__(url, response) -> None``
+        :param before_intercept: pre-interception callback object.
+        :type before_intercept: ``callable`` with signature
+            ``"(url) -> result"``
+        :param after_intercept: post-interception callable object
+        :type after_intercept: ``callable`` with signature
+            ``"(url, response) -> None"``
+
+        :raises AssertionError: if ``client`` is not an instance of ``Client``
+        :raises AssertionError: if ``detector`` is not an instance of
+            ``Detector``.
         """
 
         # required arguments
@@ -82,12 +89,13 @@ class Interceptor(object):
 
     def __call__(self, request):
         """
-        Required argument(s):
+        :param request: incoming HTTP request
+        :type request: ``dict``
 
-        :param request: incoming HTTP request as a ``dict`` of variables.
-
-        Returns the response from SnapSearch backend service. The response is
-            a snapshot of the requested URL on success.
+        :returns: the response from SnapSearch backend service (or the output
+            of ``before_intercept()``, if specified and if it returns a
+            ``dict``) . On success, the response is a ``dict`` containing
+            search engine optimized representation of the URL's target.
         """
 
         # check for the eligibility of interception
