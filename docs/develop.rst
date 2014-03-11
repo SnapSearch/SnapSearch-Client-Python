@@ -1,4 +1,5 @@
-.. SnapSearch-Client-Python
+.. snapsearch-client-python document
+   :noindex:
 
 ------------------
 Future Development
@@ -8,11 +9,11 @@ Overview
 ========
 
 .. image:: https://travis-ci.org/liuyu81/SnapSearch-Client-Python.png?branch=master
-   :target: https://travis-ci.org/liuyu81/SnapSearch-Client-Python
+   :target: https://travis-ci.org/liuyu81/SnapSearch-Client-python
    :alt: Build Status
 
-.. image:: https://pypip.in/license/SnapSearch-Client-Python/badge.png
-   :target: https://pypi.python.org/pypi/SnapSearch-Client-Python/
+.. image:: https://pypip.in/license/snapsearch-client-python/badge.png
+   :target: https://pypi.python.org/pypi/snapsearch-client-python/
    :alt: License
 
 Status:
@@ -20,7 +21,7 @@ Status:
 
 Requires:
   - Python 2.6, 2.7, 3.2, 3.3
-  - HTTP lib: PycURL_ or Requests_
+  - HTTP library: PycURL_ or Requests_
 
 .. _PycURL: http://pycurl.sourceforge.net/
 .. _Requests: http://python-requests.org/
@@ -36,44 +37,77 @@ Standards
 - :RFC:`3875` : CGI 1.1
 - :PEP:`3333` : WSGI 1.0.1
 
-Objects and Interfaces
+Packages, Objects and Interfaces
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO
+
+Source Code Repository
 ~~~~~~~~~~~~~~~~~~~~~~
 
-TODO
+The code base of the `Pythonic SnapSearch Client`_ consists of four bundles of files, 
+namely,
+
+.. _`Pythonic SnapSearch Client`: https://github.com/SnapSearch/SnapSearch-Client-Python
+
+1. main package: ``src/SnapSearch``.
+2. test suite: ``tests/`` and ``.travis.yml``.
+3. documentation: ``docs/``, ``examples/``, ``LICENSE``, and ``README.rst``.
+4. miscellaneous: ``MANIFEST.in`` and ``setup.py``.
 
 
-Design Choices
-==============
-
-TODO
-
-
-Coding
-======
-
-Style Conventions
-~~~~~~~~~~~~~~~~~
+Coding Style Conventions
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 - :PEP:`8` -- identation and spacing
 - :PEP:`287` -- comments and docstrings
 - http://docs.python.org/devguide/documenting.html
 
+Design Choices
+==============
 
-Code Elements
-~~~~~~~~~~~~~
+To enable the integration of SnapSearch into mainstream Python Web technologies, we
+have made a number of design choices when implementating the Pythonic client package.
+This section explains the rationale behind these design choices.
 
-String Literals:
-  - key to a ``dict`` object: ``values['key']``, ``values.get('key')``
-  - bytes or unicode data: ``"key" in values``
-  - bytes or unicode messages: ``print("hello!")``
-  - paths or file names: ``open("filename")``
-  - docstring: ``"""doc"""``
+Stateless Core Objects
+~~~~~~~~~~~~~~~~~~~~~~
 
+The Pythonic client package decouples the three core objects, aka. ``Client``,
+``Detector``, and ``Interceptor`` from the incoming HTTP request. In particular,
+the construction of any of these three objects should be isolated from an HTTP
+request object. Moreover, there cannot be any internal states binding an instance
+of any of these three objects with a specific HTTP request.
+
+Taking the ``Detector`` for example,
+
+
+Backend Service Abstraction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Pythonic client package emplo
+    
+TODO
+
+Data Processing Responsibilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO
+
+
+Test Suite
+==========
+
+The test suite of the Pythonic ``SnapSearch-Client`` is composed of ``unittest``
+(``unittest2`` in Python 2.6) test cases. The test cases can be executed either
+directly as runnable python modules, or invoked by third-party test tools such
+as ``coverage``.
 
 Style Checking
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-Run the ``pep8`` tool to enforce style checking against :PEP:`8`.
+The preliminary form of testing is to run the ``pep8`` tool over the source code
+to enforce style conformance to :PEP:`8`.
 
 .. code-block:: bash
 
@@ -81,15 +115,10 @@ Run the ``pep8`` tool to enforce style checking against :PEP:`8`.
     $ pep8 . --verbose
 
 
-Testing
-=======
-
 Unit Test
 ~~~~~~~~~
 
-The test suite of the Pythonic ``SnapSearch-Client`` is composed of ``unittest``
-(``unittest2`` in Python 2.6) test cases. There are a few other tools that are
-useful for style checking (``pep8``) and coverage report (``coverage``).
+There are a few other tools that are useful for style checking (``pep8``) and coverage report (``coverage``).
 
 .. code-block:: bash
 
@@ -142,13 +171,15 @@ Profiling
 TODO
 
 
-Documentation
-=============
-
-TODO
-
-
 Release
 =======
 
-TODO
+Release the source tarball to `PyPI`_ -- the official Python packages index.
+Remember to bump the version number (or delete the previous release having the
+same version number).
+
+.. _`PyPI`: https://pypi.python.org
+
+.. code-block:: bash
+
+    $ python setup.py sdist upload

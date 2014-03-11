@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    SnapSearch-Client-Python
+    SnapSearch Client Python
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
     Pythonic HTTP Client and Middleware for `SnapSearch`_.
@@ -15,7 +15,7 @@
     :date: 2014/03/08
 """
 
-PACKAGE = "SnapSearch-Client-Python"
+PACKAGE = "snapsearch-client-python"
 
 import os
 import sys

@@ -1,46 +1,49 @@
-.. SnapSearch-Client-Python Document
+.. snapsearch-client-python document
    :noindex:
 
 --------------------
 Packages and Modules
 --------------------
 
+
+Core Objects
+============
+
+Framework agnostic objects and interfaces to `SnapSearch
+<https://snapsearch.io/>`_ backend service.
+
 .. automodule:: SnapSearch
+    :special-members:
 
     .. autoclass:: Client
        :members:
-       :undoc-members:
        :special-members:
 
     .. autoclass:: Detector
        :members:
-       :undoc-members:
        :special-members:
 
     .. autoclass:: Interceptor
        :members:
-       :undoc-members:
        :special-members:
-
 
 .. automodule:: SnapSearch.api
    :members:
-   :undoc-members:
    :special-members:
-
 
 .. automodule:: SnapSearch.error
    :members:
-   :undoc-members:
-   :special-members:
 
 
-.. automodule:: SnapSearch.wsgi
-   :members:
-   :undoc-members:
-   :special-members:
+Extensions
+==========
+
+Bindings for various Python web technologies.
 
 .. automodule:: SnapSearch.cgi
    :members:
-   :undoc-members:
+   :special-members:
+
+.. automodule:: SnapSearch.wsgi
+   :members:
    :special-members:

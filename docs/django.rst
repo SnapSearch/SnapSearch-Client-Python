@@ -1,0 +1,1 @@
+../examples/django/README.rst
