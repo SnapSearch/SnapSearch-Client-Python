@@ -12,8 +12,10 @@
     :date: 2014/03/08
 """
 
-__all__ = ['Response', ]
+__all__ = ['Response', 'message_extractor', ]
 
+
+import functools
 
 from .._compat import u, HTTP_STATUS_CODES
 
@@ -28,6 +30,8 @@ def _extract_message(response_body):
     payload = response_body.get('html', u("")).encode("utf-8")
 
     # response headers
+    found_content_length = False
+
     headers = []
     for item in response_body.get('headers', []):
 
@@ -44,17 +48,30 @@ def _extract_message(response_body):
                str(item['value']).encode("utf-8"))
 
         # dirty entry (needs to be fixed later)
-        if tup[0] in (b"content-type", b"content-length"):
+        if tup[0] == b"content-length":
+            found_content_length = True
             continue
 
         # selected entry
         headers.append(tup)
 
-    # fixed header entries
-    headers.append((b"content-type", b"text/html"))
-    headers.append((b"content-length", bytes(len(payload))))
+    # fixed content-length to avoid truncation of content by the web server in
+    # case the headers are to be replicated in an HTTP response message.
+    if found_content_length:
+        headers.append((b"content-length", bytes(len(payload))))
 
     return {'status': status, 'headers': headers, 'html': payload}
+
+
+def message_extractor(func):
+    """
+    Decorator for data extracting functions requiring the HTTP message fields
+    from a raw response body. This is an input preprocessing decorator for the
+    implementation of ``response_callback`` used in application bindings.
+    """
+    def wrapper(response_body):
+        return func(_extract_message(response_body))
+    return functools.update_wrapper(wrapper, func)
 
 
 class Response(object):
