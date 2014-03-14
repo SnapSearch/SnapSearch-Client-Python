@@ -7,7 +7,7 @@ python:
 
 env:
   global:
-    secure: Cp8iIajczSWw1hX6B/IgEXeumYfdIKM1pjTAATXeDqh8kyYOJvdmlSpqPuH/Vz8MUMM8MOJBGGs6z2nJvnPbP4/5675pWKIa095YfB1VwmL7JVp9PChN3cmCodqOUjZnZWucBTmCk+5zEL3+zE1dwQBCth+oczrGY/viNSzBdqQ=
+    secure: "CfqS+5SkXs6b31+D2CpdUoNh25bDhXKmJ7ah0PBP/k8XC65GdCpDKsC+lcAS59xaaxJGoHGr0neQpn8ofkpSWUtnii+eN83kLrDrV25t7s3IwmHfUkPL0L6Sf9N2l67YQQaxhhvjbbSBbWiztTeLK1fGuCu7QaV484WoBUkOmXI="
   matrix: 
     - HTTP_LIBRARY=pycurl
     - HTTP_LIBRARY=requests
