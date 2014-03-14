@@ -30,8 +30,6 @@ def _extract_message(response_body):
     payload = response_body.get('html', u("")).encode("utf-8")
 
     # response headers
-    found_content_length = False
-
     headers = []
     for item in response_body.get('headers', []):
 
@@ -47,18 +45,8 @@ def _extract_message(response_body):
         tup = (str(item['name']).lower().encode("utf-8"),
                str(item['value']).encode("utf-8"))
 
-        # dirty entry (needs to be fixed later)
-        if tup[0] == b"content-length":
-            found_content_length = True
-            continue
-
         # selected entry
         headers.append(tup)
-
-    # fixed content-length to avoid truncation of content by the web server in
-    # case the headers are to be replicated in an HTTP response message.
-    if found_content_length:
-        headers.append((b"content-length", bytes(len(payload))))
 
     return {'status': status, 'headers': headers, 'html': payload}
 

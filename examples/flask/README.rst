@@ -13,7 +13,7 @@ framework agnostic, and supports any `WSGI`_-compliant web applications, either
 hand-made, or built upon `WSGI`_ framewrorks (such as Django_, Falcon_, Flask_,
 web2py_, etc.).
 
-.. __: https://github.com/liuyu81/SnapSearch-Client-Python/
+.. __: https://github.com/SnapSearch/SnapSearch-Client-Python/
 .. _WSGI: http://legacy.python.org/dev/peps/pep-3333/
 .. _Django: https://www.djangoproject.com/
 .. _Falcon: http://falconframework.org
@@ -100,23 +100,15 @@ Verification
     $ python main.py
      * Running on http://0.0.0.0:5000/
 
-2. search engine robot visits (emulated with ``curl``).
+2. search engine robot visits (emulated with ``curl``),
 
 .. code-block:: bash
 
-    $ curl -i -A "Googlebot" http://<server ip>:5000/
+    $ curl -i -A "Googlebot" http://<server_ip>:5000/
 
-3. server log shows both the robot and SnapSearch backend service.
+and receives an *intercepted* HTTP response.
 
-.. code-block::
-
-     * Running on http://0.0.0.0:5000/
-    <robot ip> - - [13/Mar/2014 00:42:59] "GET / HTTP/1.1" 200 -
-    <SnapSearch ip> - - [13/Mar/2014 00:46:21] "GET / HTTP/1.1" 200 -
-
-4. robot receives an *intercepted* HTTP response.
-
-.. code-block::
+.. code-block:: none
 
     HTTP/1.0 200 OK
     server: Werkzeug/0.9.4 Python/2.6.6
@@ -125,3 +117,11 @@ Verification
 
     <html><head><style type="text/css">body { background: #fff }</style></head><body>Hello World!
     </body></html>
+
+3. server log shows both the robot and SnapSearch backend service.
+
+.. code-block:: none
+
+     * Running on http://0.0.0.0:5000/
+    <robot_ip> - - [13/Mar/2014 00:42:59] "GET / HTTP/1.1" 200 -
+    <snapsearch_ip> - - [13/Mar/2014 00:46:21] "GET / HTTP/1.1" 200 -

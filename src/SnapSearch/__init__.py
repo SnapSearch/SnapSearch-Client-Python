@@ -26,7 +26,7 @@ __contact__ = "liuyu@opencps.net"
 __copyright__ = 'Copyright (c) 2014 SnapSearch'
 __license__ = "MIT"
 __title__ = "SnapSearch"
-__version__ = (0, 0, 6)
+__version__ = (0, 0, 7)
 
 # import objects from sub-modules and re-export them as top-level objects
 

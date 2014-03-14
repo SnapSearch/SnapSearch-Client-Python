@@ -15,7 +15,7 @@ SnapSearch Client`_. For intercepting `CGI`_ programs written in a different
 programming language, please refer to other variations of `SnapSearch Client
 <https://github.com/SnapSearch/SnapSearch-Clients>`_.
 
-.. _`Pythonic SnapSearch Client`: https://github.com/liuyu81/
+.. _`Pythonic SnapSearch Client`: https://github.com/SnapSearch/
     SnapSearch-Client-Python/
 .. _`CGI`: http://docs.python.org/library/cgi.html
 
@@ -105,4 +105,48 @@ Integration
 Verification
 ------------
 
-TODO
+1. server servers the CGI script at ``http://<server_ip>:5000/``.
+
+.. code-block:: none
+
+    # Apache server's virtual host configuration (partial)
+    <VirtualHost *:5000>
+        ServerName <server_name>
+        CustomLog /<server_root>/log/access
+        ...
+        DocumentRoot /<server_root>/cgi/
+        ScriptAlias /cgi/ /<server_root>/cgi/
+        <Directory /<server_root>/cgi>
+            Options +ExecCGI
+            SetHandler cgi-script
+            ...
+        </Directory>
+    </VirtualHost>
+
+2. search engine robot visits (emulated with ``curl``),
+
+.. code-block:: bash
+
+    $ curl -i A "Googlebot" http://<server_ip>:5000/main.py
+
+and receives an *intercepted* HTTP response
+
+.. code-block:: none
+
+    HTTP/1.1 200 OK
+    Date: Thu, 13 Mar 2014 14:20:18 GMT
+    Server: Apache/2.2.15 (CentOS)
+    Connection: close
+    Transfer-Encoding: chunked
+    Content-Type: text/plain; charset=UTF-8
+
+    <html><head><style type="text/css">body { background: #fff }</style></head><body>Hello World!</body></html>
+
+3. server log shows both the robot and SnapSearch backend service.
+
+.. code-block:: bash
+
+    $ cat /<server_root>/log/access
+    ...
+    <robot_ip> - - [13/Mar/2014:22:20:19 +0800] "GET /main.py HTTP/1.1" 200 14
+    <snapsearch_ip> - - [13/Mar/2014:22:20:18 +0800] "GET /main.py HTTP/1.1" 200 107
