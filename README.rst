@@ -5,6 +5,9 @@
 SnapSearch Client Python
 ========================
 
+.. image:: https://travis-ci.org/SnapSearch/SnapSearch-Client-Python.png?branch=master
+   :target: https://travis-ci.org/SnapSearch/SnapSearch-Client-Python
+
 .. image:: http://badge.fury.io/py/snapsearch-client-python.png
    :target: http://badge.fury.io/py/snapsearch-client-python
 
