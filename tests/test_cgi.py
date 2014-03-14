@@ -62,7 +62,8 @@ class TestControllerMethods(unittest.TestCase):
         from SnapSearch.cgi import InterceptorController
         i = Interceptor(self.client, self.detector)
         cb = lambda r: {b"status": 200,
-                        b"headers": [(b"Content-Type", b"text/html"), ],
+                        b"headers": [(b"Content-Type", b"text/html"),
+                                     (b"Server", b"apache (CentOS)"), ],
                         b"html": b"Hello World!\r\n", }
         ic = InterceptorController(i, cb)
         self.assertEqual(i, ic.interceptor)

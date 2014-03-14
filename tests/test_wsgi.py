@@ -74,7 +74,8 @@ class TestMiddlewareMethods(unittest.TestCase):
         a = DummyApp()
         i = Interceptor(self.client, self.detector)
         cb = lambda r: {b"status": 200,
-                        b"headers": [(b"Content-Type", b"text/html"), ],
+                        b"headers": [(b"Content-Type", b"text/html"),
+                                     (b"Server", b"apache (CentOS)"), ],
                         b"html": b"Hello World!\r\n", }
         im = InterceptorMiddleware(a, i, cb)
         self.assertEqual(a, im.application)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    SnapSearch-Client-Python
+    SnapSearch Client Python
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
     Pythonic HTTP Client and Middleware for `SnapSearch`_.
@@ -15,7 +15,7 @@
     :date: 2014/03/08
 """
 
-PACKAGE = "SnapSearch-Client-Python"
+PACKAGE = "snapsearch-client-python"
 
 import os
 import sys
@@ -83,7 +83,7 @@ setup(
     description="Pythonic HTTP Client and Middleware Library for SnapSearch",
     long_description=open("README.rst").read(),
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",

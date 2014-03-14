@@ -21,6 +21,17 @@ import SnapSearch.api as api
 from .interceptor import Interceptor
 
 
+@api.response.message_extractor
+def default_response_callback(response_body):
+    """
+    Removes staled HTTP headers from response body
+    """
+    response_body['headers'] = [
+        (key, val) for key, val in response_body['headers']
+        if key.lower() in (b"location", b"server", b"status")]
+    return response_body
+
+
 class InterceptorMiddleware(object):
     """
     Wraps a WSGI-defined web application (see :PEP:`3333`) and intercepts
@@ -77,7 +88,7 @@ class InterceptorMiddleware(object):
         self.__application = application
         self.__interceptor = interceptor
         self.__response_callback = response_callback \
-            if callable(response_callback) else api.response._extract_message
+            if callable(response_callback) else default_response_callback
         pass
 
     def __call__(self, environ, start_response):

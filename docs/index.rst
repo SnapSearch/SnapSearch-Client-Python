@@ -1,7 +1,8 @@
-.. SnapSearch-Client-Python
+.. snapsearch-client-python document
+   :noindex:
 
 ========================
-SnapSearch-Client-Python
+SnapSearch Client Python
 ========================
 
 Pythonic HTTP Client and Middleware Library for `SnapSearch`_.
@@ -10,7 +11,7 @@ Pythonic HTTP Client and Middleware Library for `SnapSearch`_.
 
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     usage
     api

@@ -28,10 +28,11 @@ from .response import Response
 def _build_message(content):
 
     # import locally to allow override
-    from . import SNAPSEARCH_API_ACCEPT_ENCODING
+    from . import SNAPSEARCH_API_ACCEPT_ENCODING, SNAPSEARCH_API_USER_AGENT
 
     payload = b(content)
     headers = {
+        "User-Agent": SNAPSEARCH_API_USER_AGENT,
         "Accept-Encoding": SNAPSEARCH_API_ACCEPT_ENCODING,
         "Content-Type": "application/json",
         "Content-Length": len(payload)}

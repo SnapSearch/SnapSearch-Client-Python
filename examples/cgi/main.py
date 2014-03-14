@@ -20,9 +20,11 @@ def hello_world():
     msg = b"Hello World!"
     sys.stdout.write(b"Status: 200 OK\r\n")
     sys.stdout.write(b"Content-Type: text/html; charset=utf-8\r\n")
-    sys.stdout.write(b"Content-Length: %d\r\n" % len(msg))
+    sys.stdout.write(b"Content-Length: ")
+    sys.stdout.write(bytes(len(msg)))
+    sys.stdout.write(b"\r\n\r\n")
+    sys.stdout.write(msg)
     sys.stdout.write(b"\r\n")
-    sys.stdout.write(b"%s\r\n" % msg)
     return 0
 
 

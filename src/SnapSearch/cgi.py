@@ -22,6 +22,17 @@ import SnapSearch.api as api
 from .interceptor import Interceptor
 
 
+@api.response.message_extractor
+def default_response_callback(response_body):
+    """
+    Removes staled HTTP headers from response body
+    """
+    response_body['headers'] = [
+        (key, val) for key, val in response_body['headers']
+        if key.lower() in (b"location", b"server", b"status")]
+    return response_body
+
+
 class InterceptorController(object):
     """
     Wraps a CGI script (see :RFC:`3875`) by temporarily buffering its standard
@@ -71,7 +82,7 @@ class InterceptorController(object):
         #
         self.__interceptor = interceptor
         self.__response_callback = response_callback \
-            if callable(response_callback) else api.response._extract_message
+            if callable(response_callback) else default_response_callback
         self.__real_stdout = None
         self.__stdout_buffer = None
         pass
