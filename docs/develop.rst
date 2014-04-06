@@ -43,7 +43,7 @@ Data Exchange Formats
 - :RFC:`3986` : URI
 - `ECMA 404 <http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf>`_: JSON
 - Google AJAX crawling: https://developers.google.com/webmasters/ajax-crawling/docs/specification
-- SnapSearch backend service: https://snapsearch.io/documentation#parameters
+- SnapSearch backend service: https://snapsearch.io/documentation#apiUsage
 
 Modules, Objects and Interfaces
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
