@@ -76,7 +76,7 @@ among all client packages of SnapSearch.
 Coding Style Conventions
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-- :PEP:`8` -- identation and spacing
+- :PEP:`8` -- indentation and spacing
 - :PEP:`287` -- comments and docstrings
 - http://docs.python.org/devguide/documenting.html
 

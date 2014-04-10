@@ -99,7 +99,7 @@ class AnyEnv(object):
         """
         # (WSGI) applications are allowed to add new entries to the ``environ``
         # per the WSGI 1.0.1 spec (see :PEP:`3333` Specification Details).
-        if not "SnapSearch.encoded_url" in self.environ:
+        if "SnapSearch.encoded_url" not in self.environ:
             self.environ['SnapSearch.encoded_url'] = \
                 self._get_encoded_url(True)
         return self.environ['SnapSearch.encoded_url']

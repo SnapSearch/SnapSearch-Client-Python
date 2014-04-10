@@ -153,11 +153,11 @@ class Detector(object):
         environ = api.AnyEnv(request)
 
         # do not intercept protocols other than HTTP and HTTPS
-        if not environ.scheme in ("http", "https", ):
+        if environ.scheme not in ("http", "https", ):
             return None
 
         # do not intercept HTTP methods other than GET
-        if not environ.method in ("GET", ):
+        if environ.method not in ("GET", ):
             return None
 
         # user agent may not exist in the HTTP request
@@ -251,7 +251,7 @@ class Detector(object):
             matches = re.match(extension_regex, real_path, re.U | re.X)
             if matches:
                 url_extension = matches.group(1).lower()
-                if not url_extension in valid_extensions:
+                if url_extension not in valid_extensions:
                     return None
 
         # detect escaped fragment (since the ignored user agents has already

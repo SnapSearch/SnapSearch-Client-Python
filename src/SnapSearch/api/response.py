@@ -36,9 +36,9 @@ def _extract_message(response_body):
         # bad entries
         if not isinstance(item, dict):
             continue
-        if not "name" in item:
+        if "name" not in item:
             continue
-        if not "value" in item:
+        if "value" not in item:
             continue
 
         # candidate entry
