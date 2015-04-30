@@ -8,7 +8,7 @@ SnapSearch Client Python
 .. image:: https://travis-ci.org/SnapSearch/SnapSearch-Client-Python.png?branch=master
    :target: https://travis-ci.org/SnapSearch/SnapSearch-Client-Python
 
-.. image:: http://badge.fury.io/py/snapsearch-client-python.png
+.. image:: https://badge.fury.io/py/snapsearch-client-python.svg
    :target: http://badge.fury.io/py/snapsearch-client-python
 
 .. image:: https://pypip.in/d/snapsearch-client-python/badge.png
