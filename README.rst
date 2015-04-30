@@ -94,6 +94,7 @@ using the `Pythonic SnapSearch Client`_ in your Python web applications.
 For full documentation on the API and API request parameters see:
 https://snapsearch.io/documentation
 
+**By the way, you need to blacklist non-html resources such as `sitemap.xml`. This is explained in https://snapsearch.io/documentation#notes**
 
 Basic Usage
 -----------
