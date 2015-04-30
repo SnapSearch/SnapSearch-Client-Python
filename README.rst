@@ -11,14 +11,6 @@ SnapSearch Client Python
 .. image:: https://badge.fury.io/py/snapsearch-client-python.svg
    :target: http://badge.fury.io/py/snapsearch-client-python
 
-.. image:: https://pypip.in/d/snapsearch-client-python/badge.png
-   :target: https://crate.io/packages/snapsearch-client-python/
-   :alt: Downloads
-
-.. image:: https://pypip.in/license/snapsearch-client-python/badge.png
-   :target: https://pypi.python.org/pypi/snapsearch-client-python/
-   :alt: License
-
 SnapSearch Client Python is a Python based framework agnostic HTTP client
 library for SnapSearch (https://snapsearch.io/).
 
