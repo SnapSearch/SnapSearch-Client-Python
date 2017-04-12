@@ -174,7 +174,7 @@ class Detector(object):
         # do not intercept requests from ignored robots
         ignore_regex = u("|").join(
             [re.escape(tok) for tok in self.robots.get('ignore', [])])
-        if re.match(ignore_regex, user_agent, re.I | re.U):
+        if re.search(ignore_regex, user_agent, re.I | re.U):
             return None
 
         # do not intercept if there exist whitelisted route(s) (matched_routes)
@@ -183,7 +183,7 @@ class Detector(object):
             found = False
             for route in self.__matched_routes:
                 route_regex = u(route)
-                if re.match(route_regex, real_path, re.I | re.U):
+                if re.search(route_regex, real_path, re.I | re.U):
                     found = True
                     break
             if not found:
@@ -194,7 +194,7 @@ class Detector(object):
         if self.__ignored_routes:
             for route in self.__ignored_routes:
                 route_regex = u(route)
-                if re.match(route_regex, real_path, re.I | re.U):
+                if re.search(route_regex, real_path, re.I | re.U):
                     return None
 
         # detect extensions in order to prevent direct requests to static files
@@ -262,7 +262,7 @@ class Detector(object):
         # intercept requests from matched robots
         matched_regex = u("|").join(
             [re.escape(tok) for tok in self.robots.get('match', [])])
-        if re.match(matched_regex, user_agent, re.I | re.U):
+        if re.search(matched_regex, user_agent, re.I | re.U):
             return environ.url
 
         # do not intercept if no match at all
