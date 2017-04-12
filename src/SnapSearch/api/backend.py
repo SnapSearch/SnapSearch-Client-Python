@@ -35,7 +35,7 @@ def _build_message(content):
         "User-Agent": SNAPSEARCH_API_USER_AGENT,
         "Accept-Encoding": SNAPSEARCH_API_ACCEPT_ENCODING,
         "Content-Type": "application/json",
-        "Content-Length": len(payload)}
+        "Content-Length": str(len(payload))}
 
     return headers, payload
 
