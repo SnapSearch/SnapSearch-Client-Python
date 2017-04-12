@@ -111,7 +111,7 @@ class InterceptorMiddleware(object):
         message = self.response_callback(response)
 
         # ship out
-        start_response(message['status'], message['headers'])
-        return message['html']
+        start_response(message['status'], [(str(name), str(value)) for name, value in message['headers']])
+        return message['html'],
 
     pass
