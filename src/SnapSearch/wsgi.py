@@ -17,6 +17,7 @@ import os
 import sys
 
 import SnapSearch.api as api
+from SnapSearch._compat import PY2
 
 from .interceptor import Interceptor
 
@@ -111,7 +112,11 @@ class InterceptorMiddleware(object):
         message = self.response_callback(response)
 
         # ship out
-        start_response(message['status'], message['headers'])
-        return message['html']
+        if PY2:
+            start_response(message['status'], message['headers'])
+        else:
+            start_response(message['status'].decode(), [(name.decode(), value.decode()) for name, value in message['headers']])
+        return message['html'],
+
 
     pass
